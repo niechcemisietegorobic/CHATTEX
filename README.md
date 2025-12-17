@@ -110,3 +110,7 @@ Zrzuty ekranu znajdują się w katalogu:
 ```
 screenshots/
 ```
+=======
+# project-app
+projekcik
+>>>>>>> 04ac0d261072f10c79f67a9a6379b57e6ab19b61
