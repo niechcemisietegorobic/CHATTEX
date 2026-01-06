@@ -1,11 +1,13 @@
 const API_URL = "http://localhost:5000";
 const el = (id) => document.getElementById(id);
 
+// naglowki do zapytan jak juz sie zalogujesz
 function tokenHeader() {
   const t = localStorage.getItem('token');
   return {'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json'};
 }
 
+// przelaczenie zakladek miedzy publicznym czatem, wiadomosciami prywatnymi a forum
 function setActiveTab(name) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tabpane').forEach(p => p.classList.add('hidden'));
@@ -17,11 +19,13 @@ document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
 });
 
+// pokazanie formularza rejestracji
 el('show-register').addEventListener('click', (e) => {
   e.preventDefault();
   el('register-section').style.display = 'block';
 });
 
+// rejestracja
 el('register-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = el('reg-username').value;
@@ -40,6 +44,8 @@ el('register-form').addEventListener('submit', async (e) => {
   }
 });
 
+
+// logowanie sie do apki
 el('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = el('login-username').value;
@@ -56,19 +62,23 @@ el('login-form').addEventListener('submit', async (e) => {
     return;
   }
 
+  //zapisanie tokenu i nazwy urzytkownika 
   localStorage.setItem('token', data.token);
   localStorage.setItem('username', data.user.username);
 
+  // przejscie z ekranu logowania do apki
   el('auth-section').style.display = 'none';
   el('app-section').style.display = 'block';
   el('welcome').innerText = `Witaj, ${data.user.username}!`;
 
+
+  //odswieżenie danych po raz pierwszy
   await refreshUsers(true);
   await refreshPublic();
   await refreshDM(true);
   await refreshPosts();
 
-  // ✅ Naprawa DM: co 5s odśwież users + DM + public
+  // co 5s odśwież users + DM + public
   clearInterval(window.publicInterval);
   clearInterval(window.dmInterval);
   clearInterval(window.forumInterval);
@@ -78,6 +88,8 @@ el('login-form').addEventListener('submit', async (e) => {
   window.forumInterval = setInterval(refreshPosts, 7000);
 });
 
+
+//wylogowywanie
 el('logout-btn').addEventListener('click', () => {
   localStorage.removeItem('token');
   localStorage.removeItem('username');
@@ -88,7 +100,7 @@ el('logout-btn').addEventListener('click', () => {
   clearInterval(window.forumInterval);
 });
 
-// ----- USERS (DM select) -----
+// ----- USERS (lista pozniej do prywatnych wiadomosci DM) -----
 async function refreshUsers(forceSelectFirst) {
   const r = await fetch(`${API_URL}/api/users`);
   const users = await r.json();
@@ -98,6 +110,7 @@ async function refreshUsers(forceSelectFirst) {
   const prev = sel.value;
   sel.innerHTML = '';
 
+  //w dm pokazuje kazdego opocz mnie
   const others = users.filter(u => u !== me);
   others.forEach(u => {
     const opt = document.createElement('option');
@@ -111,7 +124,7 @@ async function refreshUsers(forceSelectFirst) {
   else if (forceSelectFirst && others.length > 0) sel.value = others[0];
 }
 
-// ----- PUBLIC CHAT -----
+// ----- PUBLICZNY CHAT -----
 async function refreshPublic() {
   const r = await fetch(`${API_URL}/api/public/messages`);
   const list = await r.json();
@@ -147,6 +160,7 @@ async function refreshDM(forceTrySelectFirst) {
   const sel = el('dm-user');
   if (!sel) return;
 
+  //jesli nie ma wybranego usera
   if (!sel.value && forceTrySelectFirst) {
     await refreshUsers(true);
   }
@@ -199,7 +213,7 @@ el('dm-form').addEventListener('submit', async (e) => {
   }
 });
 
-// ----- FORUM: posts + comments + reactions -----
+// ----- FORUM: posty + komentarze + reakcje -----
 const EMOJIS = ["👍","❤️","😂","😮","😡"];
 
 async function toggleReaction(postId, emoji) {
@@ -246,7 +260,7 @@ async function refreshPosts() {
     body.className = 'post-body';
     body.textContent = p.body;
 
-    // Reactions row
+    //reakcje
     const reactRow = document.createElement('div');
     reactRow.className = 'react-row';
 
@@ -260,7 +274,7 @@ async function refreshPosts() {
       reactRow.appendChild(btn);
     });
 
-    // Comments list
+    //lista komentarzy
     const commBox = document.createElement('div');
     commBox.className = 'comments';
 
@@ -271,7 +285,7 @@ async function refreshPosts() {
       commBox.appendChild(line);
     });
 
-    // Add comment form
+    //dodawanie komentarza
     const form = document.createElement('form');
     form.className = 'row';
     form.innerHTML = `
