@@ -97,19 +97,13 @@ Projekt jest przygotowany pod wdrożenie w chmurze AWS:
 
 ---
 
-## 👨‍💻 Autor
+## 👨‍💻 Autorzy
 Projekt wykonany zespołowo (podział na 3 części).
 
-Autor części aplikacyjnej:
 NASZE INDEXY
 
 ---
 
-## 📸 Zrzuty ekranu
-Zrzuty ekranu znajdują się w katalogu:
-```
-screenshots/
-```
 =======
 # project-app
 projekcik
