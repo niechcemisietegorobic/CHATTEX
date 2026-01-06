@@ -6,6 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Backend aplikacji CHATTEX
+# Flask + SQLite (lokalnie), gotowe pod AWS
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,12 +19,14 @@ CORS(app)
 
 # ---------- MODELE ----------
 class User(db.Model):
+    # Użytkownik aplikacji
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
 
 class PublicMessage(db.Model):
+     # Wiadomości z publicznego czatu
     __tablename__ = 'public_messages'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -29,6 +34,7 @@ class PublicMessage(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 class PrivateMessage(db.Model):
+    # Prywatne wiadomości (DM)
     __tablename__ = 'private_messages'
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -37,6 +43,7 @@ class PrivateMessage(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 class ForumPost(db.Model):
+    # Posty na forum
     __tablename__ = 'forum_posts'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -45,6 +52,7 @@ class ForumPost(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 class ForumComment(db.Model):
+    # Komentarze pod postami
     __tablename__ = 'forum_comments'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('forum_posts.id'), nullable=False)
@@ -53,14 +61,16 @@ class ForumComment(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 class PostReaction(db.Model):
+    # Reakcje emoji pod postami
     __tablename__ = 'post_reactions'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('forum_posts.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     emoji = db.Column(db.String(16), nullable=False)
 
-# ---------- HELPERS ----------
+#  -------------------- FUNKCJE POMOCNICZE --------------------
 def _auth_user_id():
+    # Sprawdza token JWT i zwraca id użytkownika
     auth_header = request.headers.get('Authorization')
     if not auth_header or not auth_header.startswith('Bearer '):
         return None
@@ -72,15 +82,18 @@ def _auth_user_id():
         return None
 
 def _user_by_username(username: str):
+     # Szuka użytkownika po nazwie
     return User.query.filter_by(username=username).first()
 
-# ---------- BASIC ----------
+# ---------- PODSTAWOWE RZECZY------------------------
 @app.route('/health', methods=['GET'])
 def health():
+    # Sprawdzenie czy backend działa
     return jsonify({"status": "ok"}), 200
 
 @app.route('/api/register', methods=['POST'])
 def register():
+    # Rejestracja nowego użytkownika
     data = request.get_json() or {}
     username = (data.get('username') or '').strip()
     password = data.get('password')
@@ -96,6 +109,7 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
+    # Logowanie i generowanie tokenu JWT
     data = request.get_json() or {}
     username = (data.get('username') or '').strip()
     password = data.get('password')
@@ -114,12 +128,14 @@ def login():
 
 @app.route('/api/users', methods=['GET'])
 def list_users():
+    # Lista użytkowników (do DM)
     users = User.query.order_by(User.username.asc()).all()
     return jsonify([u.username for u in users]), 200
 
 # ---------- PUBLIC CHAT ----------
 @app.route('/api/public/messages', methods=['GET'])
 def public_get():
+    # Pobiera wiadomości z publicznego czatu
     msgs = PublicMessage.query.order_by(PublicMessage.timestamp.asc()).all()
     out = []
     for m in msgs:
@@ -134,6 +150,7 @@ def public_get():
 
 @app.route('/api/public/messages', methods=['POST'])
 def public_post():
+    # Dodaje wiadomość do publicznego czatu
     uid = _auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
@@ -201,7 +218,7 @@ def private_post():
     db.session.commit()
     return jsonify({'message': 'OK', 'id': msg.id}), 201
 
-# ---------- FORUM (posts + comments + reactions) ----------
+# ---------- FORUM (posty komentarze emoji jako reakcje) ----------
 def _reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}
@@ -241,6 +258,7 @@ def forum_get_posts():
 
 @app.route('/api/forum/posts', methods=['POST'])
 def forum_add_post():
+    #dodawanie wlasnego posta
     uid = _auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
@@ -258,6 +276,7 @@ def forum_add_post():
 
 @app.route('/api/forum/comments', methods=['POST'])
 def forum_add_comment():
+    # komentarze
     uid = _auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
@@ -279,6 +298,7 @@ def forum_add_comment():
 
 @app.route('/api/forum/reactions', methods=['POST'])
 def forum_toggle_reaction():
+    # emoji
     uid = _auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
