@@ -3,3 +3,4 @@ pyvenv.cfg
 include/
 bin/
 lib64
+backend/instance/app.db
