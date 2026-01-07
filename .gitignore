@@ -4,3 +4,6 @@ include/
 bin/
 lib64
 backend/instance/app.db
+app.db
+Scripts
+__pycache__

@@ -11,26 +11,6 @@ Aplikacja umożliwia:
 
 ---
 
-## 🧩 Funkcjonalności
-
-### 👥 Użytkownicy
-- rejestracja i logowanie użytkowników,
-- uwierzytelnianie za pomocą tokenów JWT.
-
-### 💬 Publiczny czat
-- wspólny kanał dla wszystkich zalogowanych użytkowników,
-- automatyczne odświeżanie wiadomości.
-
-### 🔒 Prywatne wiadomości
-- wybór użytkownika z listy,
-- dwukierunkowa komunikacja prywatna.
-
-### 🧵 Forum
-- tworzenie postów (tytuł + treść),
-- lista postów widoczna dla wszystkich użytkowników.
-
----
-
 ## 🏗 Architektura aplikacji
 
 Aplikacja składa się z dwóch głównych komponentów:
@@ -58,7 +38,7 @@ frontend/
 
 ---
 
-## 🚀 Uruchomienie aplikacji (lokalnie)
+## Uruchomienie aplikacji (lokalnie)
 
 ### Backend
 ```bash
@@ -103,8 +83,3 @@ Projekt wykonany zespołowo (podział na 3 części).
 NASZE INDEXY
 
 ---
-
-=======
-# project-app
-projekcik
->>>>>>> 04ac0d261072f10c79f67a9a6379b57e6ab19b61
