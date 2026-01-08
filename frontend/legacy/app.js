@@ -105,28 +105,28 @@ async function connectSocket() {
 // });
 
 // ----- USERS (lista pozniej do prywatnych wiadomosci DM) -----
-async function refreshUsers(forceSelectFirst) {
-  const r = await fetch(`${API_URL}/api/users`);
-  const users = await r.json();
-  const me = localStorage.getItem('username');
-  const sel = el('dm-user');
+// async function refreshUsers(forceSelectFirst) {
+//   const r = await fetch(`${API_URL}/api/users`);
+//   const users = await r.json();
+//   const me = localStorage.getItem('username');
+//   const sel = el('dm-user');
 
-  const prev = sel.value;
-  sel.innerHTML = '';
+//   const prev = sel.value;
+//   sel.innerHTML = '';
 
-  //w dm pokazuje kazdego opocz mnie
-  const others = users.filter(u => u !== me);
-  others.forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u;
-    opt.textContent = u;
-    sel.appendChild(opt);
-  });
+//   //w dm pokazuje kazdego opocz mnie
+//   const others = users.filter(u => u !== me);
+//   others.forEach(u => {
+//     const opt = document.createElement('option');
+//     opt.value = u;
+//     opt.textContent = u;
+//     sel.appendChild(opt);
+//   });
 
-  // zachowaj wybór jeśli się da
-  if (others.includes(prev)) sel.value = prev;
-  else if (forceSelectFirst && others.length > 0) sel.value = others[0];
-}
+//   // zachowaj wybór jeśli się da
+//   if (others.includes(prev)) sel.value = prev;
+//   else if (forceSelectFirst && others.length > 0) sel.value = others[0];
+// }
 
 // ----- PUBLICZNY CHAT -----
 // async function refreshPublic() {
@@ -231,112 +231,112 @@ async function toggleReaction(postId, emoji) {
   await refreshPosts();
 }
 
-async function addComment(postId, body) {
-  const r = await fetch(`${API_URL}/api/forum/comments`, {
-    method: 'POST',
-    headers: tokenHeader(),
-    body: JSON.stringify({post_id: postId, body})
-  });
-  const data = await r.json();
-  if (r.status !== 201) alert(data.error || 'Błąd komentarza');
-  await refreshPosts();
-}
+// async function addComment(postId, body) {
+//   const r = await fetch(`${API_URL}/api/forum/comments`, {
+//     method: 'POST',
+//     headers: tokenHeader(),
+//     body: JSON.stringify({post_id: postId, body})
+//   });
+//   const data = await r.json();
+//   if (r.status !== 201) alert(data.error || 'Błąd komentarza');
+//   await refreshPosts();
+// }
 
-async function refreshPosts() {
-  const r = await fetch(`${API_URL}/api/forum/posts`);
-  const posts = await r.json();
-  const box = el('posts');
-  box.innerHTML = '';
+// async function refreshPosts() {
+//   const r = await fetch(`${API_URL}/api/forum/posts`);
+//   const posts = await r.json();
+//   const box = el('posts');
+//   box.innerHTML = '';
 
-  posts.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'post';
+//   posts.forEach(p => {
+//     const card = document.createElement('div');
+//     card.className = 'post';
 
-    const h = document.createElement('div');
-    h.className = 'post-title';
-    h.textContent = p.title;
+//     const h = document.createElement('div');
+//     h.className = 'post-title';
+//     h.textContent = p.title;
 
-    const meta = document.createElement('div');
-    meta.className = 'post-meta';
-    meta.textContent = `${p.timestamp} • ${p.author}`;
+//     const meta = document.createElement('div');
+//     meta.className = 'post-meta';
+//     meta.textContent = `${p.timestamp} • ${p.author}`;
 
-    const body = document.createElement('div');
-    body.className = 'post-body';
-    body.textContent = p.body;
+//     const body = document.createElement('div');
+//     body.className = 'post-body';
+//     body.textContent = p.body;
 
-    //reakcje
-    const reactRow = document.createElement('div');
-    reactRow.className = 'react-row';
+//     //reakcje
+//     const reactRow = document.createElement('div');
+//     reactRow.className = 'react-row';
 
-    EMOJIS.forEach(em => {
-      const btn = document.createElement('button');
-      btn.type = "button";
-      btn.className = "emoji";
-      const count = (p.reactions && p.reactions[em]) ? p.reactions[em] : 0;
-      btn.textContent = `${em} ${count}`;
-      btn.addEventListener('click', () => toggleReaction(p.id, em));
-      reactRow.appendChild(btn);
-    });
+//     EMOJIS.forEach(em => {
+//       const btn = document.createElement('button');
+//       btn.type = "button";
+//       btn.className = "emoji";
+//       const count = (p.reactions && p.reactions[em]) ? p.reactions[em] : 0;
+//       btn.textContent = `${em} ${count}`;
+//       btn.addEventListener('click', () => toggleReaction(p.id, em));
+//       reactRow.appendChild(btn);
+//     });
 
-    //lista komentarzy
-    const commBox = document.createElement('div');
-    commBox.className = 'comments';
+//     //lista komentarzy
+//     const commBox = document.createElement('div');
+//     commBox.className = 'comments';
 
-    (p.comments || []).forEach(c => {
-      const line = document.createElement('div');
-      line.className = 'comment';
-      line.textContent = `${c.timestamp} - ${c.author}: ${c.body}`;
-      commBox.appendChild(line);
-    });
+//     (p.comments || []).forEach(c => {
+//       const line = document.createElement('div');
+//       line.className = 'comment';
+//       line.textContent = `${c.timestamp} - ${c.author}: ${c.body}`;
+//       commBox.appendChild(line);
+//     });
 
-    //dodawanie komentarza
-    const form = document.createElement('form');
-    form.className = 'row';
-    form.innerHTML = `
-      <input type="text" class="comment-input" placeholder="Dodaj komentarz..." required />
-      <button type="submit">Dodaj</button>
-    `;
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const inp = form.querySelector('.comment-input');
-      const txt = inp.value;
-      inp.value = '';
-      await addComment(p.id, txt);
-    });
+//     //dodawanie komentarza
+//     const form = document.createElement('form');
+//     form.className = 'row';
+//     form.innerHTML = `
+//       <input type="text" class="comment-input" placeholder="Dodaj komentarz..." required />
+//       <button type="submit">Dodaj</button>
+//     `;
+//     form.addEventListener('submit', async (e) => {
+//       e.preventDefault();
+//       const inp = form.querySelector('.comment-input');
+//       const txt = inp.value;
+//       inp.value = '';
+//       await addComment(p.id, txt);
+//     });
 
-    card.appendChild(h);
-    card.appendChild(meta);
-    card.appendChild(body);
-    card.appendChild(reactRow);
+//     card.appendChild(h);
+//     card.appendChild(meta);
+//     card.appendChild(body);
+//     card.appendChild(reactRow);
 
-    const commTitle = document.createElement('div');
-    commTitle.className = 'comm-title';
-    commTitle.textContent = 'Komentarze:';
-    card.appendChild(commTitle);
+//     const commTitle = document.createElement('div');
+//     commTitle.className = 'comm-title';
+//     commTitle.textContent = 'Komentarze:';
+//     card.appendChild(commTitle);
 
-    card.appendChild(commBox);
-    card.appendChild(form);
+//     card.appendChild(commBox);
+//     card.appendChild(form);
 
-    box.appendChild(card);
-  });
-}
+//     box.appendChild(card);
+//   });
+// }
 
-el('post-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const title = el('post-title').value;
-  const body = el('post-body').value;
+// el('post-form').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   const title = el('post-title').value;
+//   const body = el('post-body').value;
 
-  const r = await fetch(`${API_URL}/api/forum/posts`, {
-    method: 'POST',
-    headers: tokenHeader(),
-    body: JSON.stringify({title, body})
-  });
-  const data = await r.json();
-  if (r.status !== 201) alert(data.error || 'Błąd dodania posta');
-  else {
-    el('post-title').value = '';
-    el('post-body').value = '';
-    await refreshPosts();
-    setActiveTab('forum');
-  }
-});
+//   const r = await fetch(`${API_URL}/api/forum/posts`, {
+//     method: 'POST',
+//     headers: tokenHeader(),
+//     body: JSON.stringify({title, body})
+//   });
+//   const data = await r.json();
+//   if (r.status !== 201) alert(data.error || 'Błąd dodania posta');
+//   else {
+//     el('post-title').value = '';
+//     el('post-body').value = '';
+//     await refreshPosts();
+//     setActiveTab('forum');
+//   }
+// });

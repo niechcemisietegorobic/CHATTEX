@@ -13,12 +13,12 @@ async function addComment() {
   const r = await fetch(`${API_URL}/api/forum/comments`, {
     method: 'POST',
     headers: tokenHeader(),
-    body: JSON.stringify({post_id: props.post.id, body: typed_comment})
+    body: JSON.stringify({post_id: props.post.id, body: typed_comment.value})
   });
   const data = await r.json();
   if (r.status !== 201) alert(data.error || 'Błąd komentarza');
   else {
-    props.post.comments.push({})
+    // props.post.comments.push({})
   }
 }
 </script>
@@ -35,7 +35,8 @@ async function addComment() {
             {{ props.post.body }}
         </div>
         <div class="react-row">
-            <ForumReaction v-for="reaction in REACTIONS" :icon="reaction" />
+            <ForumReaction v-for="reaction in REACTIONS" :icon="reaction" 
+            :count="(props.post.reactions && props.post.reactions[reaction]) ? props.post.reactions[reaction] : 0" />
         </div>
         <div class="comm-title">
             Komentarze:
