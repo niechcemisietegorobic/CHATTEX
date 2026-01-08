@@ -1,106 +1,13 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <title>CHATTEX - CHATTUJ DO WOLI</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand">CHATTEX - CHATTUJ DO WOLI</div>
-      <div class="sub">Public chat • Prywatne wiadomości • Forum</div>
-    </header>
-
-    <main class="card">
-      <section id="auth-section">
-        <h2>Logowanie</h2>
-
-        <form id="login-form" class="row">
-          <input type="text" id="login-username" placeholder="Nazwa użytkownika" required />
-          <input type="password" id="login-password" placeholder="Hasło" required />
-          <button type="submit">Zaloguj</button>
-        </form>
-
-        <p class="muted">Nie masz konta? <a href="#" id="show-register">Zarejestruj się</a></p>
-
-        <div id="register-section" style="display:none;">
-          <h2>Rejestracja</h2>
-          <form id="register-form" class="row">
-            <input type="text" id="reg-username" placeholder="Nazwa użytkownika" required />
-            <input type="password" id="reg-password" placeholder="Hasło" required />
-            <button type="submit">Zarejestruj</button>
-          </form>
-        </div>
-      </section>
-
-      <section id="app-section" style="display:none;">
-        <div class="welcome-row">
-          <div id="welcome" class="welcome"></div>
-          <button id="logout-btn" class="ghost">Wyloguj</button>
-        </div>
-
-        <nav class="tabs">
-          <button class="tab active" data-tab="public">Publiczny czat</button>
-          <button class="tab" data-tab="private">Prywatne</button>
-          <button class="tab" data-tab="forum">Forum</button>
-        </nav>
-
-        <!-- PUBLICZNE -->
-        <section class="tabpane" id="tab-public">
-          <div class="panel">
-            <div class="panel-title">Publiczny czat</div>
-            <div id="public-messages" class="box"></div>
-
-            <form id="public-form" class="row">
-              <input type="text" id="public-input" placeholder="Napisz publicznie..." required />
-              <button type="submit">Wyślij</button>
-            </form>
-          </div>
-        </section>
-
-        <!-- PRYWATNE -->
-        <section class="tabpane hidden" id="tab-private">
-          <div class="panel">
-            <div class="panel-title">Prywatne wiadomości</div>
-
-            <div class="row">
-              <select id="dm-user"></select>
-              <button id="dm-refresh" type="button" class="ghost">Odśwież</button>
-            </div>
-
-            <div id="dm-messages" class="box"></div>
-
-            <form id="dm-form" class="row">
-              <input type="text" id="dm-input" placeholder="Napisz prywatnie..." required />
-              <button type="submit">Wyślij</button>
-            </form>
-          </div>
-        </section>
-
-        <!-- FORUM i wszystko wokol -->
-        <section class="tabpane hidden" id="tab-forum">
-          <div class="panel">
-            <div class="panel-title">Forum – posty</div>
-
-            <form id="post-form" class="stack">
-              <input type="text" id="post-title" placeholder="Tytuł posta" required />
-              <textarea id="post-body" placeholder="Treść posta..." rows="4" required></textarea>
-              <button type="submit">Dodaj post</button>
-            </form>
-
-            <div id="posts" class="posts"></div>
-          </div>
-        </section>
-
-      </section>
-    </main>
-
-    <footer class="foot muted">
-      DEV build (L1+L2+) • Backend: Flask • Frontend: HTML/CSS/JS
-    </footer>
-  </div>
-
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATTEX - CHATTUJ DO WOLI</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

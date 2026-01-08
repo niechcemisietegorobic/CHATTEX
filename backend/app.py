@@ -6,10 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
-from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint
-
-# Backend aplikacji CHATTEX
-# Flask + SQLite (lokalnie), gotowe pod AWS
+from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint, socket
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
@@ -17,6 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
 
 db.init_app(app)
+socket.init_app(app)
 CORS(app)
 
 app.register_blueprint(public_messages_blueprint)
@@ -73,4 +71,5 @@ def list_users():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=5000)
+    # app.run(host='0.0.0.0', port=5000)
+    socket.run(app, host='0.0.0.0', port=5000)

@@ -27,9 +27,8 @@ backend/
 ```
 
 ### Frontend
-- HTML, CSS, JavaScript (Vanilla JS)
+- VUE js 
 - komunikacja z backendem przez REST API
-- statyczny serwer `http.server`
 
 Katalog:
 ```
@@ -56,12 +55,13 @@ http://localhost:5000
 ### Frontend
 ```bash
 cd frontend
-python3 -m http.server 8010
+npm install
+npm run dev
 ```
 
 Frontend dostępny pod:
 ```
-http://localhost:8010
+http://localhost:5173
 ```
 
 ---

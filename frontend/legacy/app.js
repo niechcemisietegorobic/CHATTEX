@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:5000";
+const SOCKET_URL = "ws://localhost:5000";
 const el = (id) => document.getElementById(id);
 
 // naglowki do zapytan jak juz sie zalogujesz
@@ -8,97 +9,100 @@ function tokenHeader() {
 }
 
 // przelaczenie zakladek miedzy publicznym czatem, wiadomosciami prywatnymi a forum
-function setActiveTab(name) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tabpane').forEach(p => p.classList.add('hidden'));
-  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
-  el(`tab-${name}`).classList.remove('hidden');
-}
+// function setActiveTab(name) {
+//   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+//   document.querySelectorAll('.tabpane').forEach(p => p.classList.add('hidden'));
+//   document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+//   el(`tab-${name}`).classList.remove('hidden');
+// }
 
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
 });
 
-// pokazanie formularza rejestracji
-el('show-register').addEventListener('click', (e) => {
-  e.preventDefault();
-  el('register-section').style.display = 'block';
-});
-
 // rejestracja
-el('register-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = el('reg-username').value;
-  const password = el('reg-password').value;
+// el('register-form').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   const username = el('reg-username').value;
+//   const password = el('reg-password').value;
 
-  const r = await fetch(`${API_URL}/api/register`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password})
-  });
-  const data = await r.json();
-  if (r.status !== 201) alert(data.error || 'Rejestracja nieudana');
-  else {
-    alert('Rejestracja udana! Zaloguj się.');
-    el('register-section').style.display = 'none';
-  }
-});
+//   const r = await fetch(`${API_URL}/api/register`, {
+//     method: 'POST',
+//     headers: {'Content-Type': 'application/json'},
+//     body: JSON.stringify({username, password})
+//   });
+//   const data = await r.json();
+//   if (r.status !== 201) alert(data.error || 'Rejestracja nieudana');
+//   else {
+//     alert('Rejestracja udana! Zaloguj się.');
+//     el('register-section').style.display = 'none';
+//   }
+// });
 
 
 // logowanie sie do apki
-el('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = el('login-username').value;
-  const password = el('login-password').value;
+// el('login-form').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   const username = el('login-username').value;
+//   const password = el('login-password').value;
 
-  const r = await fetch(`${API_URL}/api/login`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password})
-  });
-  const data = await r.json();
-  if (r.status !== 200) {
-    alert(data.error || 'Logowanie nieudane');
-    return;
-  }
+//   const r = await fetch(`${API_URL}/api/login`, {
+//     method: 'POST',
+//     headers: {'Content-Type': 'application/json'},
+//     body: JSON.stringify({username, password})
+//   });
+//   const data = await r.json();
+//   if (r.status !== 200) {
+//     alert(data.error || 'Logowanie nieudane');
+//     return;
+//   }
 
-  //zapisanie tokenu i nazwy urzytkownika 
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('username', data.user.username);
+//   //zapisanie tokenu i nazwy urzytkownika 
+//   localStorage.setItem('token', data.token);
+//   localStorage.setItem('username', data.user.username);
 
-  // przejscie z ekranu logowania do apki
-  el('auth-section').style.display = 'none';
-  el('app-section').style.display = 'block';
-  el('welcome').innerText = `Witaj, ${data.user.username}!`;
+//   // przejscie z ekranu logowania do apki
+//   el('auth-section').style.display = 'none';
+//   el('app-section').style.display = 'block';
+//   el('welcome').innerText = `Witaj, ${data.user.username}!`;
 
 
   //odswieżenie danych po raz pierwszy
-  await refreshUsers(true);
-  await refreshPublic();
-  await refreshDM(true);
-  await refreshPosts();
+//   await refreshUsers(true);
+//   await refreshPublic();
+//   await refreshDM(true);
+//   await refreshPosts();
 
-  // co 5s odśwież users + DM + public
-  clearInterval(window.publicInterval);
-  clearInterval(window.dmInterval);
-  clearInterval(window.forumInterval);
+//   // co 5s odśwież users + DM + public
+//   // clearInterval(window.publicInterval);
+//   connectSocket();
+//   clearInterval(window.dmInterval);
+//   clearInterval(window.forumInterval);
 
-  window.publicInterval = setInterval(refreshPublic, 5000);
-  window.dmInterval = setInterval(async () => { await refreshUsers(false); await refreshDM(false); }, 5000);
-  window.forumInterval = setInterval(refreshPosts, 7000);
-});
+//   // window.publicInterval = setInterval(refreshPublic, 5000);
+//   window.dmInterval = setInterval(async () => { await refreshUsers(false); await refreshDM(false); }, 5000);
+//   window.forumInterval = setInterval(refreshPosts, 7000);
+// });
+
+async function connectSocket() {
+  var socket = new WebSocket(SOCKET_URL);
+
+  socket.addEventListener("open", (event) => {
+    socket.send("test");
+  });
+}
 
 
 //wylogowywanie
-el('logout-btn').addEventListener('click', () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
-  el('app-section').style.display = 'none';
-  el('auth-section').style.display = 'block';
-  clearInterval(window.publicInterval);
-  clearInterval(window.dmInterval);
-  clearInterval(window.forumInterval);
-});
+// el('logout-btn').addEventListener('click', () => {
+//   localStorage.removeItem('token');
+//   localStorage.removeItem('username');
+//   el('app-section').style.display = 'none';
+//   el('auth-section').style.display = 'block';
+//   clearInterval(window.publicInterval);
+//   clearInterval(window.dmInterval);
+//   clearInterval(window.forumInterval);
+// });
 
 // ----- USERS (lista pozniej do prywatnych wiadomosci DM) -----
 async function refreshUsers(forceSelectFirst) {

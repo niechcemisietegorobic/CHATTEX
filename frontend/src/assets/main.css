@@ -1,0 +1,169 @@
+@import './base.css';
+
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  color:#111;
+  background: url("background.png") center/cover no-repeat fixed;
+}
+
+
+.card{
+  background: rgba(255,255,255,0.92);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+}
+
+.muted {
+  color: #4b5563;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.stack{
+  display:flex;
+  flex-direction: column;
+  gap:10px;
+  margin: 12px 0 16px;
+}
+
+input, textarea, select{
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  min-width: 220px;
+}
+textarea{ min-width: 280px; }
+
+button{
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  background: #111827;
+  color: #fff;
+}
+button.ghost{
+  background: transparent;
+  color:#111827;
+  border: 1px solid #d1d5db;
+}
+
+.welcome-row{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.welcome{ font-weight: 800; }
+
+.tabs{
+  display:flex;
+  gap:8px;
+  margin: 12px 0;
+}
+.tab{
+  background: #e5e7eb;
+  color:#111;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+.tab.active{
+  background: #111827;
+  color:#fff;
+}
+
+.tabpane.hidden{ display:none; }
+
+.panel-title{
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.box{
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  height: 260px;
+  overflow-y: auto;
+  background: #f9fafb;
+}
+
+.msg{
+  padding: 6px 8px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.posts{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post{
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.post-title{
+  font-weight: 900;
+  font-size: 16px;
+}
+.post-meta{
+  font-size: 12px;
+  color:#6b7280;
+  margin-top: 2px;
+}
+.post-body{
+  margin-top: 10px;
+  white-space: pre-wrap;
+}
+
+.react-row{
+  display:flex;
+  gap:8px;
+  flex-wrap: wrap;
+  margin: 10px 0 8px;
+}
+
+button.emoji{
+  background: #f3f4f6;
+  color:#111;
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.comm-title{
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.comments{
+  background:#f9fafb;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.comment{
+  padding: 6px 6px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 13px;
+}
+.comment:last-child{ border-bottom: 0; }
