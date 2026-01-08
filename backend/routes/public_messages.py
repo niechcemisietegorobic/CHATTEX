@@ -33,4 +33,10 @@ def public_post():
     msg = PublicMessage(user_id=uid, content=content)
     db.session.add(msg)
     db.session.commit()
-    return jsonify({'message': 'OK', 'id': msg.id}), 201
+    u = User.query.get(msg.user_id)
+    return jsonify({
+        'id': msg.id,
+        'username': u.username if u else 'Nieznany',
+        'content': msg.content,
+        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    }), 201

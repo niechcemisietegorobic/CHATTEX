@@ -58,7 +58,16 @@ def forum_add_post():
     p = ForumPost(author_id=uid, title=title, body=body)
     db.session.add(p)
     db.session.commit()
-    return jsonify({'message': 'OK', 'id': p.id}), 201
+    author =  User.query.get(p.author_id)
+    return jsonify({
+        'id': p.id,
+        'author': author.username if author else 'Nieznany',
+        'title': p.title,
+        'body': p.body,
+        'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        'reactions': _reaction_counts_for_post(p.id),
+        'comments': _comments_for_post(p.id),
+    }), 201
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
 def forum_add_comment():
@@ -80,7 +89,13 @@ def forum_add_comment():
     c = ForumComment(post_id=p.id, author_id=uid, body=body)
     db.session.add(c)
     db.session.commit()
-    return jsonify({'message': 'OK', 'id': c.id}), 201
+    u =  User.query.get(c.author_id)
+    return jsonify({
+        'id': c.id,
+        'author': u.username if u else 'Nieznany',
+        'body': c.body,
+        'timestamp': c.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    }), 201
 
 @forum_blueprint.route('/api/forum/reactions', methods=['POST'])
 def forum_toggle_reaction():
@@ -106,4 +121,4 @@ def forum_toggle_reaction():
         db.session.add(PostReaction(post_id=p.id, user_id=uid, emoji=emoji))
     db.session.commit()
 
-    return jsonify({'message': 'OK', 'reactions': _reaction_counts_for_post(p.id)}), 200
+    return jsonify(_reaction_counts_for_post(p.id)), 200

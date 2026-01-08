@@ -57,4 +57,11 @@ def private_post():
     msg = PrivateMessage(sender_id=uid, receiver_id=other.id, content=content)
     db.session.add(msg)
     db.session.commit()
-    return jsonify({'message': 'OK', 'id': msg.id}), 201
+    u =  User.query.get(msg.sender_id)
+    return jsonify({
+        'id': msg.id,
+        'from': u.username if u else 'Nieznany',
+        'to': to_user,
+        'content': msg.content,
+        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    }), 201

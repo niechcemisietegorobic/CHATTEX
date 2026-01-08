@@ -22,11 +22,7 @@ async function sendMessage() {
   const data = await r.json();
   if (r.status !== 201) alert(data.error || 'Błąd');
   else {
-    messages.value.push({
-        timestamp: Date.now(),
-        username: ">(You)",
-        content: typed_message.value
-    })
+    messages.value.push(data);
     typed_message.value = "";
   }
 }
