@@ -129,35 +129,35 @@ async function refreshUsers(forceSelectFirst) {
 }
 
 // ----- PUBLICZNY CHAT -----
-async function refreshPublic() {
-  const r = await fetch(`${API_URL}/api/public/messages`);
-  const list = await r.json();
-  const box = el('public-messages');
-  box.innerHTML = '';
-  list.forEach(m => {
-    const p = document.createElement('div');
-    p.className = 'msg';
-    p.textContent = `${m.timestamp} - ${m.username}: ${m.content}`;
-    box.appendChild(p);
-  });
-  box.scrollTop = box.scrollHeight;
-}
+// async function refreshPublic() {
+//   const r = await fetch(`${API_URL}/api/public/messages`);
+//   const list = await r.json();
+//   const box = el('public-messages');
+//   box.innerHTML = '';
+//   list.forEach(m => {
+//     const p = document.createElement('div');
+//     p.className = 'msg';
+//     p.textContent = `${m.timestamp} - ${m.username}: ${m.content}`;
+//     box.appendChild(p);
+//   });
+//   box.scrollTop = box.scrollHeight;
+// }
 
-el('public-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const content = el('public-input').value;
-  const r = await fetch(`${API_URL}/api/public/messages`, {
-    method: 'POST',
-    headers: tokenHeader(),
-    body: JSON.stringify({content})
-  });
-  const data = await r.json();
-  if (r.status !== 201) alert(data.error || 'Błąd');
-  else {
-    el('public-input').value = '';
-    await refreshPublic();
-  }
-});
+// el('public-form').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   const content = el('public-input').value;
+//   const r = await fetch(`${API_URL}/api/public/messages`, {
+//     method: 'POST',
+//     headers: tokenHeader(),
+//     body: JSON.stringify({content})
+//   });
+//   const data = await r.json();
+//   if (r.status !== 201) alert(data.error || 'Błąd');
+//   else {
+//     el('public-input').value = '';
+//     await refreshPublic();
+//   }
+// });
 
 // ----- PRIVATE (DM) -----
 async function refreshDM(forceTrySelectFirst) {
