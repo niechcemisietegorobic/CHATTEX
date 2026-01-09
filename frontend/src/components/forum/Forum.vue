@@ -93,3 +93,16 @@ refreshPosts();
     </div>
   </section>
 </template>
+
+<style scoped>
+.panel-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+</style>

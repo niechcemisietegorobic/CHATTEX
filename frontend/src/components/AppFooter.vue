@@ -1,5 +1,5 @@
 <template>
-  <footer class="foot muted">
+  <footer class="foot">
     DEV build • Backend: Flask • Frontend: vue + ts
   </footer>
 </template>
