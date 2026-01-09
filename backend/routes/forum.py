@@ -1,6 +1,7 @@
 from models import PostReaction, ForumComment, ForumPost, User, db
 from flask import request, jsonify, Blueprint
 from helpers import _auth_user_id
+from websock import socket_sessions, socket
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
@@ -59,7 +60,7 @@ def forum_add_post():
     db.session.add(p)
     db.session.commit()
     author =  User.query.get(p.author_id)
-    return jsonify({
+    response = {
         'id': p.id,
         'author': author.username if author else 'Nieznany',
         'title': p.title,
@@ -67,7 +68,9 @@ def forum_add_post():
         'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
         'reactions': _reaction_counts_for_post(p.id),
         'comments': _comments_for_post(p.id),
-    }), 201
+    }
+    [socket.emit("forum_post", response, to=k) for k, v in socket_sessions.items() if v != p.author_id]
+    return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
 def forum_add_comment():
@@ -90,12 +93,14 @@ def forum_add_comment():
     db.session.add(c)
     db.session.commit()
     u =  User.query.get(c.author_id)
-    return jsonify({
+    response = {
         'id': c.id,
         'author': u.username if u else 'Nieznany',
         'body': c.body,
         'timestamp': c.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    }), 201
+    }
+    [socket.emit("forum_comment", {'post_id': p.id, 'comment': response}, to=k) for k, v in socket_sessions.items() if v != c.author_id]
+    return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/reactions', methods=['POST'])
 def forum_toggle_reaction():
@@ -121,4 +126,6 @@ def forum_toggle_reaction():
         db.session.add(PostReaction(post_id=p.id, user_id=uid, emoji=emoji))
     db.session.commit()
 
-    return jsonify(_reaction_counts_for_post(p.id)), 200
+    response = _reaction_counts_for_post(p.id)
+    [socket.emit("forum_reactions", {'post_id': p.id, 'reactions': response}, to=k) for k, v in socket_sessions.items() if v != uid]
+    return jsonify(response), 200

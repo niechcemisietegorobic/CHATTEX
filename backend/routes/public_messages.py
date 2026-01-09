@@ -1,6 +1,7 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import _auth_user_id
+from websock import socket, socket_sessions
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
@@ -34,9 +35,11 @@ def public_post():
     db.session.add(msg)
     db.session.commit()
     u = User.query.get(msg.user_id)
-    return jsonify({
+    response = {
         'id': msg.id,
         'username': u.username if u else 'Nieznany',
         'content': msg.content,
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    }), 201
+    }
+    [socket.emit("public_message", response, to=k) for k, v in socket_sessions.items() if v != msg.user_id]
+    return jsonify(response), 201
