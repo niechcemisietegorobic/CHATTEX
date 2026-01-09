@@ -1,16 +1,31 @@
 <script lang="ts" setup>
-import { API_URL, tokenHeader } from '@/constants';
-import { ref, type Ref } from 'vue';
+import { API_URL, tokenHeader, SOCKET_URL } from '@/constants';
+import { ref, type Ref, onUnmounted } from 'vue';
 import ChatMessage from './ChatMessage.vue';
+import { io } from 'socket.io-client';
 
 const messages: Ref<any, any> = ref([])
 const typed_message = ref('')
 
-async function refreshPublic() {
-    const r = await fetch(`${API_URL}/api/public/messages`);
-    const list = await r.json();
+const socket = io(SOCKET_URL, {
+  auth: {
+    token: tokenHeader().Authorization
+  }
+});
 
-    messages.value = list;
+onUnmounted(() => {
+  socket.close();
+});
+
+socket.on("public_message", (msg) => {
+  messages.value.push(msg);
+});
+
+async function refreshPublic() {
+  const r = await fetch(`${API_URL}/api/public/messages`);
+  const list = await r.json();
+
+  messages.value = list;
 }
 
 async function sendMessage() {
@@ -31,17 +46,17 @@ refreshPublic();
 </script>
 
 <template>
-    <!-- PUBLICZNE -->
-    <section class="tabpane" id="tab-public">
-        <div class="panel">
-            <div class="panel-title">Publiczny czat</div>
-            <div id="public-messages" class="box">
-                <ChatMessage v-for="message in messages" :message/>
-            </div>
-            <form id="public-form" class="row">
-                <input v-model="typed_message" type="text" id="public-input" placeholder="Napisz publicznie..." required />
-                <button type="submit" @click.prevent="sendMessage">Wyślij</button>
-            </form>
-        </div>
-    </section>
+  <!-- PUBLICZNE -->
+  <section class="tabpane" id="tab-public">
+    <div class="panel">
+      <div class="panel-title">Publiczny czat</div>
+      <div id="public-messages" class="box">
+        <ChatMessage v-for="message in messages" :message />
+      </div>
+      <form id="public-form" class="row">
+        <input v-model="typed_message" type="text" id="public-input" placeholder="Napisz publicznie..." required />
+        <button type="submit" @click.prevent="sendMessage">Wyślij</button>
+      </form>
+    </div>
+  </section>
 </template>

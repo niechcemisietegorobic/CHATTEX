@@ -2,11 +2,11 @@ import os
 import datetime
 import jwt
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
-from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint, socket
+from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint
+from websock import socket
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')

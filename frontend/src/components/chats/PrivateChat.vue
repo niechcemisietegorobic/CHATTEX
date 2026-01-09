@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { API_URL, tokenHeader } from '@/constants';
-import { ref, type Ref } from 'vue';
+import { API_URL, tokenHeader, SOCKET_URL } from '@/constants';
+import { ref, type Ref, onUnmounted } from 'vue';
+import { io } from 'socket.io-client';
 
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
@@ -42,6 +43,20 @@ async function refreshUsers() {
     //w dm pokazuje kazdego opocz mnie
     users.value = list.filter(u => u !== me);
 }
+
+const socket = io(SOCKET_URL, {
+  auth: {
+    token: tokenHeader().Authorization
+  }
+});
+
+onUnmounted(() => {
+  socket.close();
+});
+
+socket.on("private_message", (msg) => {
+  dm.value.push(msg);
+});
 
 refreshUsers();
 </script>

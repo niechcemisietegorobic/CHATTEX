@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { API_URL, tokenHeader } from '@/constants';
-import { ref, type Ref } from 'vue';
+import { API_URL, tokenHeader, SOCKET_URL } from '@/constants';
+import { ref, type Ref, onUnmounted } from 'vue';
 import ForumPost from './ForumPost.vue';
+import { io } from 'socket.io-client';
 
 const posts: Ref<any[], any[]> = ref([]);
 const typed_title = ref('');
@@ -42,6 +43,34 @@ function updateReactions(post_id: number, reactions: any) {
     posts.value[i].reactions = reactions;
   }
 }
+
+const socket = io(SOCKET_URL, {
+  auth: {
+    token: tokenHeader().Authorization
+  }
+});
+
+onUnmounted(() => {
+  socket.close();
+});
+
+socket.on("forum_post", (post) => {
+  posts.value.unshift(post);
+});
+
+socket.on("forum_comment", (comment_response) => {
+  let i = posts.value.findIndex(post => post.id == comment_response.post_id);
+  if (i != -1) {
+    posts.value[i].comments.push(comment_response.comment);
+  }
+});
+
+socket.on("forum_reactions", (reactions_response) => {
+  let i = posts.value.findIndex(post => post.id == reactions_response.post_id);
+  if (i != -1) {
+    posts.value[i].reactions = (reactions_response.reactions);
+  }
+});
 
 refreshPosts();
 </script>

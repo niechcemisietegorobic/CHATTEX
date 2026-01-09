@@ -16,6 +16,18 @@ def _auth_user_id():
         return payload.get('user_id')
     except Exception:
         return None
+    
+def _socket_auth_user_id(auth_header):
+    # Sprawdza token JWT i zwraca id użytkownika
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return None
+    token = auth_header.split(' ')[1]
+    try:
+        payload = jwt.decode(token, os.environ.get('SECRET_KEY', 'dev_secret_key'), algorithms=['HS256'])
+        return payload.get('user_id')
+    except Exception:
+        return None
+    
 
 def _user_by_username(username: str):
      # Szuka użytkownika po nazwie
