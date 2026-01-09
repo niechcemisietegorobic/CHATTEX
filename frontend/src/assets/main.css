@@ -7,17 +7,12 @@ body{
   background: url("background.png") center/cover no-repeat fixed;
 }
 
-
 .card{
   background: rgba(255,255,255,0.92);
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 18px 60px rgba(0,0,0,0.45);
   backdrop-filter: blur(6px);
-}
-
-.muted {
-  color: #4b5563;
 }
 
 .row{
@@ -42,6 +37,7 @@ input, textarea, select{
   outline: none;
   min-width: 220px;
 }
+
 textarea{ min-width: 280px; }
 
 button{
@@ -52,20 +48,12 @@ button{
   background: #111827;
   color: #fff;
 }
+
 button.ghost{
   background: transparent;
   color:#111827;
   border: 1px solid #d1d5db;
 }
-
-.welcome-row{
-  display:flex;
-  justify-content: space-between;
-  align-items:center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.welcome{ font-weight: 800; }
 
 .tabs{
   display:flex;
@@ -85,11 +73,6 @@ button.ghost{
 
 .tabpane.hidden{ display:none; }
 
-.panel-title{
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
 .box{
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -99,17 +82,5 @@ button.ghost{
   background: #f9fafb;
 }
 
-.msg{
-  padding: 6px 8px;
-  border-bottom: 1px solid #eef2f7;
-  font-size: 14px;
-  white-space: pre-wrap;
-}
-
-.posts{
-  display:flex;
-  flex-direction: column;
-  gap: 10px;
-}
 
 .comment:last-child{ border-bottom: 0; }

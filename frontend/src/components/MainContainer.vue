@@ -18,7 +18,8 @@ function updateIsLogged(val: boolean) {
 <template>
     <main class="card">
 
-        <AuthSection v-if="!is_logged" @updateIsLogged="updateIsLogged" @updateUsername="updateUsername" :is_logged="is_logged" :username="username" />
+        <AuthSection v-if="!is_logged" @updateIsLogged="updateIsLogged" @updateUsername="updateUsername" 
+            :is_logged="is_logged" :username="username" />
 
         <AppSection v-else :username="username" @updateIsLogged="updateIsLogged" />
 

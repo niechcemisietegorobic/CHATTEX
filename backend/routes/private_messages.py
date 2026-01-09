@@ -68,3 +68,9 @@ def private_post():
     }
     [socket.emit("private_message", response, to=k) for k, v in socket_sessions.items() if v == other.id]
     return jsonify(response), 201
+
+@private_messages_blueprint.route('/api/users', methods=['GET'])
+def list_users():
+    # Lista użytkowników (do DM)
+    users = User.query.order_by(User.username.asc()).all()
+    return jsonify([u.username for u in users]), 200

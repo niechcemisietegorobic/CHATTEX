@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { API_URL, tokenHeader, SOCKET_URL } from '@/constants';
-import { ref, type Ref, onUnmounted } from 'vue';
+import { ref, type Ref, onUnmounted, nextTick } from 'vue';
 import { io } from 'socket.io-client';
+import ChatMessage from './ChatMessage.vue';
 
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
 const dm: Ref<any> = ref([]);
 const typed_message = ref('');
+const chat_box: Ref<any> = ref(null);
 
 async function refreshDM() {
     dm.value = [];
@@ -19,6 +21,7 @@ async function refreshDM() {
         return;
     }
     dm.value = data;
+    scrollChatBox();
 }
 
 async function sendDM() {
@@ -32,6 +35,7 @@ async function sendDM() {
     if (r.status !== 201) alert(data.error || 'Błąd wysyłania');
     else {
         dm.value.push(data);
+        scrollChatBox();
     }
 }
 
@@ -44,18 +48,29 @@ async function refreshUsers() {
     users.value = list.filter(u => u !== me);
 }
 
+function scrollChatBox() {
+    nextTick(() => {
+        if (chat_box.value) {
+            chat_box.value.scrollTop = chat_box.value.scrollHeight;
+        }
+    });
+}
+
 const socket = io(SOCKET_URL, {
-  auth: {
-    token: tokenHeader().Authorization
-  }
+    auth: {
+        token: tokenHeader().Authorization
+    }
 });
 
 onUnmounted(() => {
-  socket.close();
+    socket.close();
 });
 
 socket.on("private_message", (msg) => {
-  dm.value.push(msg);
+    if (msg.from == selected_user.value) {
+        dm.value.push(msg);
+        scrollChatBox();
+    }
 });
 
 refreshUsers();
@@ -74,9 +89,9 @@ refreshUsers();
                 <button id="dm-refresh" type="button" class="ghost" @click="refreshUsers">Odśwież</button>
             </div>
 
-            <div id="dm-messages" class="box">
-                <div class="msg" v-if="dm.length == 0">Brak wiadomości do wyświetlenia</div>
-                <div class="msg" v-else v-for="m in dm">{{ m.timestamp }} - {{ m.from }}: {{ m.content }}</div>
+            <div ref="chat_box" id="dm-messages" class="box">
+                <div v-if="dm.length == 0">Brak wiadomości do wyświetlenia</div>
+                <ChatMessage v-else v-for="message in dm" :isPrivate="true" :message/>
             </div>
 
             <form id="dm-form" class="row">
@@ -86,3 +101,10 @@ refreshUsers();
         </div>
     </section>
 </template>
+
+<style scoped>
+.panel-title{
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+</style>

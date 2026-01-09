@@ -69,4 +69,8 @@ async function login() {
 
 </template>
 
-<style scoped></style>
+<style scoped>
+.muted {
+  color: #4b5563;
+}
+</style>
