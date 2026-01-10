@@ -20,5 +20,5 @@ COPY backend/ /backend/
 
 EXPOSE 8000
 
-CMD ["python3", "-m", "gunicorn", "-w", "4", "'app:app'"]
+CMD ["python3", "-m", "gunicorn", "-w", "4", "app:app"]
 
