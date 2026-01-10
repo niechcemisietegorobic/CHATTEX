@@ -20,5 +20,5 @@ COPY backend/ /backend/
 
 EXPOSE 80
 
-CMD ["python3", "--bind", "0.0.0.0:80", "-m", "gunicorn", "-w", "4", "app:socket"]
+CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:80", "-k", "gevent", "-w", "1", "app:app"]
 
