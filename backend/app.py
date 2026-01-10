@@ -5,7 +5,10 @@ from models import db
 from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint, auth_blueprint
 from websock import socket
 
-app = Flask(__name__)
+app = Flask(__name__
+    # static_folder='static',
+    # static_url_path='/'
+    )
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
