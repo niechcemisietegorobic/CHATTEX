@@ -19,7 +19,6 @@ Aplikacja składa się z dwóch głównych komponentów:
 - Python + Flask
 - REST API
 - JWT (autoryzacja)
-- SQLite (środowisko developerskie)
 
 Katalog:
 ```
@@ -56,8 +55,8 @@ http://localhost:5000
 ```bash
 cd frontend
 npm install
-export VITE_API_URL="http://localhost:5000"
-export VITE_WEBSOCKET_API_URL="ws://localhost:5000"
+export VITE_CHATTEX_API_URL="http://localhost:5000"
+export VITE_CHATTEX_WEBSOCKET_API_URL="ws://localhost:5000"
 npm run dev
 ```
 
@@ -76,7 +75,7 @@ Projekt jest przygotowany pod wdrożenie w chmurze AWS:
 - RDS (relacyjna baza danych, private subnet),
 - VPC z podziałem na public/private subnety,
 - kod aplikacji pobierany z GitHub.
-- frontend budowany przez aws code build i umieszczany na publiczny S3
+- frontend budowany przez aws code build i umieszczany na publicznym S3
 ---
 
 ## 👨‍💻 Autorzy
