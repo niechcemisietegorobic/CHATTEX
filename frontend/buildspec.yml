@@ -13,10 +13,12 @@ phases:
   pre_build:
     on-failure: ABORT
     commands:
+      - cd frontend
       - npm ci
   build:
     on-failure: ABORT
     commands:
+      - cd frontend
       - npm run build
   # post_build:
   #   on-failure: ABORT
@@ -26,4 +28,4 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: dist
+  base-directory: frontend/dist
