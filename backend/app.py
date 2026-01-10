@@ -22,12 +22,13 @@ app.register_blueprint(public_messages_blueprint)
 app.register_blueprint(private_messages_blueprint)
 app.register_blueprint(forum_blueprint)
 
+with app.app_context():
+    db.create_all()
+
 @app.route('/health', methods=['GET'])
 def health():
     # Sprawdzenie czy backend działa
     return jsonify({"status": "ok"}), 200
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     socket.run(app, host='0.0.0.0', port=5000)

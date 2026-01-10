@@ -1,5 +1,5 @@
-export const API_URL = "http://localhost:5000";
-export const SOCKET_URL = "ws://localhost:5000";
+export const API_URL = import.meta.env.VITE_API_URL;
+export const SOCKET_URL = import.meta.env.VITE_WEBSOCKET_API_URL;
 
 export function tokenHeader() {
   const t = localStorage.getItem('token');

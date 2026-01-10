@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ /backend/
 # COPY --from=frontend-stage /frontend/dist/ /backend/static/
 
-EXPOSE 8000
+EXPOSE 80
 
-CMD ["python3", "-m", "gunicorn", "-w", "4", "app:app"]
+CMD ["python3", "--bind", "0.0.0.0:80", "-m", "gunicorn", "-w", "4", "app:socket"]
 
