@@ -66,9 +66,11 @@ async function login() {
     <div v-else id="register-section">
       <h2>Rejestracja</h2>
       <form id="register-form" class="row">
+        <div class="row">
+          <input v-model="invite_code" type="text" placeholder="Kod zaproszenia" required />
+        </div>
         <input v-model="field_username" type="text" id="reg-username" placeholder="Nazwa użytkownika" required />
         <input v-model="password" type="password" id="reg-password" placeholder="Hasło" required />
-        <input v-model="invite_code" type="text" placeholder="Kod zaproszenia" required />
         <button type="submit" @click.prevent="register()">Zarejestruj</button>
       </form>
 

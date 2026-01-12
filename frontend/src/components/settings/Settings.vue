@@ -1,7 +1,27 @@
 <script lang="ts" setup>
+import { API_URL } from '@/constants';
+import { ref } from 'vue';
+
 const props = defineProps(["username"]);
 
+const is_changing_username = ref(false);
+const changed_username = ref(props.username);
 const bg = new URL('@/assets/background.png', import.meta.url).href
+
+async function change_username() {
+    const r = await fetch(`${API_URL}/user/username`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: changed_username.value })
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Zmiana nazwy użytkownika zakończona niepowodzeniem.');
+        return;
+    }
+
+    is_changing_username.value = false;
+}
 </script>
 
 <template>
@@ -9,8 +29,12 @@ const bg = new URL('@/assets/background.png', import.meta.url).href
         <div class="panel">
             <div class="panel-title">Ustawienia</div>
 
-            <div class="row setting">
-                Nazwa użytkownika: {{ props.username }}
+            <div v-if="is_changing_username" class="row setting">
+                Nowa nazwa użytkownika: <input v-model="change_username" type="text" placeholder="Nazwa użytkownika"/> 
+                <button @click="change_username">Zapisz</button>
+            </div>
+            <div v-else class="row setting">
+                Nazwa użytkownika: {{ props.username }} <button @click="is_changing_username = true">Zmień</button>
             </div>
 
             <div class="row setting">

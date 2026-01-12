@@ -3,6 +3,9 @@ from flask import request, jsonify, Blueprint, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
+from helpers import get_root_invite
+
+ROOT_INVITE = get_root_invite()
 
 auth_blueprint = Blueprint("auth_blueprint", __name__)
 
@@ -19,12 +22,12 @@ def register():
         return jsonify({'error': 'Użytkownik już istnieje'}), 400
     invite = Invite.query.filter_by(code=invite_code).first()
     # FIXME
-    if invite_code == "TESTTEST":
+    if invite_code == ROOT_INVITE:
         pass
     elif not invite:
         return jsonify({'error': 'Błędny kod zaproszenia'}), 400
     
-    u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=None)
+    u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=None if not invite else invite.user_id)
     db.session.add(u)
     db.session.commit()
     return jsonify({'message': 'Rejestracja udana'}), 201
