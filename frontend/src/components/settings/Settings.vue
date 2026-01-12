@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { API_URL } from '@/constants';
+import { API_URL, tokenHeader } from '@/constants';
 import { ref } from 'vue';
 
 const props = defineProps(["username"]);
@@ -9,9 +9,9 @@ const changed_username = ref(props.username);
 const bg = new URL('@/assets/background.png', import.meta.url).href
 
 async function change_username() {
-    const r = await fetch(`${API_URL}/user/username`, {
+    const r = await fetch(`${API_URL}/api/user/username`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: tokenHeader(),
         body: JSON.stringify({ username: changed_username.value })
     });
     const data = await r.json();

@@ -7,6 +7,9 @@ public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
 @public_messages_blueprint.route('/api/public/messages', methods=['GET'])
 def public_get():
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     # Pobiera wiadomości z publicznego czatu
     msgs = PublicMessage.query.order_by(PublicMessage.timestamp.asc()).all()
     out = []
