@@ -21,11 +21,11 @@ def register():
     invite = Invite.query.filter_by(code=invite_code).first()
     # FIXME
     if invite_code == "TESTTEST":
-        invite = {"invited_by_id": None}
+        pass
     elif not invite:
         return jsonify({'error': 'Błędny kod zaproszenia'}), 400
     
-    u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=invite.user_id)
+    u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=None)
     db.session.add(u)
     db.session.commit()
     return jsonify({'message': 'Rejestracja udana'}), 201
