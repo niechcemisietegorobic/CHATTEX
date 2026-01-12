@@ -21,12 +21,16 @@ phases:
     on-failure: ABORT
     commands:
       - npm run build
-  # post_build:
-  #   on-failure: ABORT
-  #   commands:
-  #     - aws s3 sync frontend/dist/ s3://chattex-frontend-dev --delete
+  post-build:
+    on-failure: ABORT
+    commands:
+      - aws s3 sync frontend/dist/ s3://chattex-frontend-dev/ \
+        --cache-control "public, max-age=86400, immutable" \
+        --exclude "index.html"
+      - aws s3 cp frontend/dist/index.html s3://chattex-frontend-dev/index.html \
+        --cache-control "public, max-age=300"
 
-artifacts:
-  files:
-    - '**/*'
-  base-directory: frontend/dist
+# artifacts:
+#   files:
+#     - '**/*'
+#   base-directory: frontend/dist
