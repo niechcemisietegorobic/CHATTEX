@@ -10,6 +10,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    invited_by_id = db.Column(db.Integer, nullable=True)
 
 class PublicMessage(db.Model):
      # Wiadomości z publicznego czatu
@@ -53,3 +54,9 @@ class PostReaction(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('forum_posts.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     emoji = db.Column(db.String(16), nullable=False)
+
+class Invite(db.Model):
+    __tablename__ = 'user_invites'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    code = db.Column(db.String(8), nullable=False)

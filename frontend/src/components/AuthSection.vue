@@ -2,18 +2,23 @@
 import { ref } from 'vue';
 import { API_URL } from '@/constants';
 
-const props = defineProps(["is_logged", "username"])
-const emit = defineEmits(["updateIsLogged", "updateUsername"])
+const props = defineProps(["is_logged", "username"]);
+const emit = defineEmits(["updateIsLogged", "updateUsername"]);
 
-const register_visible = ref(false)
-const field_username = ref('')
-const password = ref('')
+const register_visible = ref(false);
+const field_username = ref('');
+const password = ref('');
+const invite_code = ref('');
 
 async function register() {
   const r = await fetch(`${API_URL}/api/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: field_username.value, password: password.value })
+    body: JSON.stringify({
+      username: field_username.value,
+      password: password.value,
+      invite_code: invite_code.value
+    })
   });
   const data = await r.json();
   if (r.status !== 201) alert(data.error || 'Rejestracja nieudana');
@@ -63,11 +68,12 @@ async function login() {
       <form id="register-form" class="row">
         <input v-model="field_username" type="text" id="reg-username" placeholder="Nazwa użytkownika" required />
         <input v-model="password" type="password" id="reg-password" placeholder="Hasło" required />
+        <input v-model="invite_code" type="text" placeholder="Kod zaproszenia" required />
         <button type="submit" @click.prevent="register()">Zarejestruj</button>
       </form>
 
-      <p class="muted">Masz już konto? <a href="#" @click.prevent="register_visible = false"
-          id="show-register">Zaloguj się</a></p>
+      <p class="muted">Masz już konto? <a href="#" @click.prevent="register_visible = false" id="show-register">Zaloguj
+          się</a></p>
     </div>
 
   </section>

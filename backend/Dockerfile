@@ -1,6 +1,5 @@
 FROM python:3.13
 
-ENV IS_DEV="true"
 WORKDIR /backend
 
 COPY ./requirements.txt /backend/
