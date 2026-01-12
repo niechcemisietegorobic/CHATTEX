@@ -1,9 +1,8 @@
 from models import User, Invite, db
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
-import os
 
 auth_blueprint = Blueprint("auth_blueprint", __name__)
 
@@ -44,7 +43,7 @@ def login():
         return jsonify({'error': 'Nieprawidłowa nazwa użytkownika lub hasło'}), 401
 
     token_payload = {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8)}
-    token = jwt.encode(token_payload, os.environ.get('SECRET_KEY', 'dev_secret_key'), algorithm='HS256')
+    token = jwt.encode(token_payload, current_app.config["SECRET_KEY"], algorithm='HS256')
     if isinstance(token, bytes):
         token = token.decode('utf-8')
     return jsonify({'token': token, 'user': {'id': user.id, 'username': user.username}}), 200

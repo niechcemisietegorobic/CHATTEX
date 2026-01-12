@@ -1,34 +1,35 @@
-
 import jwt
-from flask import request
+from flask import request, current_app
 import os
 from models import User
 
 #  -------------------- FUNKCJE POMOCNICZE --------------------
-def _auth_user_id():
+def auth_user_id():
     # Sprawdza token JWT i zwraca id użytkownika
     auth_header = request.headers.get('Authorization')
     if not auth_header or not auth_header.startswith('Bearer '):
         return None
     token = auth_header.split(' ')[1]
     try:
-        payload = jwt.decode(token, os.environ.get('SECRET_KEY', 'dev_secret_key'), algorithms=['HS256'])
+        payload = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=['HS256'])
         return payload.get('user_id')
     except Exception:
         return None
     
-def _socket_auth_user_id(auth_header):
+def socket_auth_user_id(auth_header):
     # Sprawdza token JWT i zwraca id użytkownika
     if not auth_header or not auth_header.startswith('Bearer '):
         return None
     token = auth_header.split(' ')[1]
     try:
-        payload = jwt.decode(token, os.environ.get('SECRET_KEY', 'dev_secret_key'), algorithms=['HS256'])
+        payload = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=['HS256'])
         return payload.get('user_id')
     except Exception:
         return None
-    
 
-def _user_by_username(username: str):
+def user_by_username(username: str):
      # Szuka użytkownika po nazwie
     return User.query.filter_by(username=username).first()
+
+def is_dev():
+    return os.environ.get('IS_DEV', 'false').lower() == 'true'

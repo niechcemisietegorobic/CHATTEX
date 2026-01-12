@@ -1,6 +1,6 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
-from helpers import _auth_user_id
+from helpers import auth_user_id
 from websock import socket, socket_sessions
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
@@ -23,7 +23,7 @@ def public_get():
 @public_messages_blueprint.route('/api/public/messages', methods=['POST'])
 def public_post():
     # Dodaje wiadomość do publicznego czatu
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     data = request.get_json() or {}
