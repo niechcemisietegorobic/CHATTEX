@@ -46,23 +46,28 @@ async function login() {
 
 <template>
   <section id="auth-section">
-    <h2>Logowanie</h2>
-    <form id="login-form" class="row">
-      <input v-model="field_username" type="text" id="login-username" placeholder="Nazwa użytkownika" required />
-      <input v-model="password" type="password" id="login-password" placeholder="Hasło" required />
-      <button type="submit" @click.prevent="login()">Zaloguj</button>
-    </form>
+    <div v-if="!register_visible" id="register-section">
+      <h2>Logowanie</h2>
+      <form id="login-form" class="row">
+        <input v-model="field_username" type="text" id="login-username" placeholder="Nazwa użytkownika" required />
+        <input v-model="password" type="password" id="login-password" placeholder="Hasło" required />
+        <button type="submit" @click.prevent="login()">Zaloguj</button>
+      </form>
 
-    <p class="muted">Nie masz konta? <a href="#" @click.prevent="register_visible = true" id="show-register">Zarejestruj
-        się</a></p>
+      <p class="muted">Nie masz konta? <a href="#" @click.prevent="register_visible = true"
+          id="show-register">Zarejestruj się</a></p>
+    </div>
 
-    <div v-if="register_visible" id="register-section">
+    <div v-else id="register-section">
       <h2>Rejestracja</h2>
       <form id="register-form" class="row">
         <input v-model="field_username" type="text" id="reg-username" placeholder="Nazwa użytkownika" required />
         <input v-model="password" type="password" id="reg-password" placeholder="Hasło" required />
         <button type="submit" @click.prevent="register()">Zarejestruj</button>
       </form>
+
+      <p class="muted">Masz już konto? <a href="#" @click.prevent="register_visible = false"
+          id="show-register">Zaloguj się</a></p>
     </div>
 
   </section>

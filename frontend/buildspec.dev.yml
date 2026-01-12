@@ -1,9 +1,11 @@
 version: 0.2
 
 env:
+  variables:
+    VITE_CHATTEX_DEV: "true"
   parameter-store:
-    VITE_CHATTEX_API_URL: "VITE_CHATTEX_API_URL_DEV"
-    VITE_CHATTEX_WEBSOCKET_API_URL: "VITE_CHATTEX_WEBSOCKET_API_URL_DEV"
+    VITE_CHATTEX_API_URL: "/CHATTEX_DEV/API_URL"
+    VITE_CHATTEX_WEBSOCKET_API_URL: "/CHATTEX_DEV/WEBSOCKET_API_URL"
 
 phases:
   install:
@@ -22,7 +24,7 @@ phases:
   # post_build:
   #   on-failure: ABORT
   #   commands:
-  #     - aws s3 sync dist/ s3://chattex-frontend-dev --delete
+  #     - aws s3 sync frontend/dist/ s3://chattex-frontend-dev --delete
 
 artifacts:
   files:
