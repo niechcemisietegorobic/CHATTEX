@@ -21,7 +21,7 @@ phases:
     on-failure: ABORT
     commands:
       - npm run build
-  post-build:
+  post_build:
     on-failure: ABORT
     commands:
       - aws s3 sync frontend/dist/ s3://chattex-frontend-dev/ \
