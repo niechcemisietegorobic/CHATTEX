@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
 
 db.init_app(app)
 socket.init_app(app)
-CORS(app)#, origins=["https://dev.chattex.cyanjnpr.dev", "https://chattex.cyanjnpr.dev"])
+CORS(app, origins=["https://dev.chattex.cyanjnpr.dev", "https://chattex.cyanjnpr.dev"])
 
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(public_messages_blueprint)

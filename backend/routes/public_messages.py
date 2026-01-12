@@ -5,7 +5,6 @@ from websock import socket, socket_sessions
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
-# ---------- PUBLIC CHAT ----------
 @public_messages_blueprint.route('/api/public/messages', methods=['GET'])
 def public_get():
     # Pobiera wiadomości z publicznego czatu

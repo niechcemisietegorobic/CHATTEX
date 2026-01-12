@@ -5,7 +5,6 @@ from websock import socket_sessions, socket
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
-# ---------- FORUM (posty komentarze emoji jako reakcje) ----------
 def _reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}

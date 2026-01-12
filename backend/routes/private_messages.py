@@ -5,7 +5,6 @@ from websock import socket, socket_sessions
 
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
-# ---------- PRIVATE (DM) ----------
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
 def private_get():
     uid = _auth_user_id()
