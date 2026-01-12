@@ -1,6 +1,10 @@
+<script lang="ts" setup>
+  import { IS_DEV, BUILD_NUMBER } from '@/constants';
+</script>
+
 <template>
   <footer class="foot">
-    DEV build • Backend: Flask • Frontend: vue + ts
+    {{ `${IS_DEV ? "Dev" : "Prod"} build ${IS_DEV ? BUILD_NUMBER : "" } • Backend: Flask • Frontend: vue + ts` }}
   </footer>
 </template>
 

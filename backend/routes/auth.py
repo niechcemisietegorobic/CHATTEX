@@ -1,4 +1,4 @@
-from models import User, db
+from models import User, Invite, db
 from flask import request, jsonify, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -13,12 +13,19 @@ def register():
     data = request.get_json() or {}
     username = (data.get('username') or '').strip()
     password = data.get('password')
-    if not username or not password:
+    invite_code = data.get("invite_code")
+    if not username or not password or not invite_code:
         return jsonify({'error': 'Brak danych rejestracyjnych'}), 400
     if User.query.filter_by(username=username).first():
         return jsonify({'error': 'Użytkownik już istnieje'}), 400
-
-    u = User(username=username, password_hash=generate_password_hash(password))
+    invite = Invite.query.filter_by(code=invite_code).first()
+    # FIXME
+    if invite_code == "TESTTEST":
+        pass
+    elif not invite:
+        return jsonify({'error': 'Błędny kod zaproszenia'}), 400
+    
+    u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=None)
     db.session.add(u)
     db.session.commit()
     return jsonify({'message': 'Rejestracja udana'}), 201

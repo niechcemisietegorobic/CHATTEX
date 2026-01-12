@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  variables:
+    VITE_CHATTEX_DEV: "false"
+  parameter-store:
+    VITE_CHATTEX_API_URL: "/CHATTEX_PROD/API_URL"
+    VITE_CHATTEX_WEBSOCKET_API_URL: "/CHATTEX_PROD/WEBSOCKET_API_URL"
+
+phases:
+  install:
+    on-failure: ABORT
+    runtime-versions:
+      nodejs: 22
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - cd frontend
+      - npm ci
+  build:
+    on-failure: ABORT
+    commands:
+      - npm run build
+  post_build:
+    on-failure: ABORT
+    commands:
+      - aws s3 sync dist/ s3://chattex-frontend-prod/ --cache-control "public, max-age=604800, immutable" --exclude "index.html"
+      - aws s3 cp dist/index.html s3://chattex-frontend-prod/index.html --cache-control "public, max-age=300"
+
+# artifacts:
+#   files:
+#     - '**/*'
+#   base-directory: frontend/dist
