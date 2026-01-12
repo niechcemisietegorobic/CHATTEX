@@ -8,6 +8,7 @@ from routes import (
     )
 from helpers import is_dev
 from websock import socket
+import json
 import boto3
 from botocore.exceptions import ClientError
 
@@ -19,10 +20,10 @@ def get_django_secret_key(is_dev: bool = False):
         region_name="us-east-1"
     )
     try:
-        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        secret_value_response = client.get_secret_value(SecretId=secret_name)
     except ClientError as e:
         raise e
-    secret = get_secret_value_response['SECRET_KEY']
+    secret = json.loads(secret_value_response['SecretString'])['SECRET_KEY']
     print(len(secret), "THIS IS A FETCH TEST ---------------<<<<<<<<<<<<<<<<<<<<")
     print("dev" if is_dev else "prod")
     return secret
