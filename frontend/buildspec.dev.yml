@@ -20,11 +20,12 @@ phases:
   build:
     on-failure: ABORT
     commands:
+      - export VITE_CHATTEX_BUILD_NUMBER="$CODEBUILD_BUILD_NUMBER"
       - npm run build
   post_build:
     on-failure: ABORT
     commands:
-      - aws s3 sync dist/ s3://chattex-frontend-dev/ --cache-control "public, max-age=86400, immutable" --exclude "index.html"
+      - aws s3 sync dist/ s3://chattex-frontend-dev/ --cache-control "public, max-age=604800, immutable" --exclude "index.html"
       - aws s3 cp dist/index.html s3://chattex-frontend-dev/index.html --cache-control "public, max-age=300"
 
 # artifacts:
