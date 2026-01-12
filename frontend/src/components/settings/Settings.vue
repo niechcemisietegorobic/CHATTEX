@@ -30,7 +30,7 @@ async function change_username() {
             <div class="panel-title">Ustawienia</div>
 
             <div v-if="is_changing_username" class="row setting">
-                Nowa nazwa użytkownika: <input v-model="change_username" type="text" placeholder="Nazwa użytkownika"/> 
+                Nowa nazwa użytkownika: <input v-model="changed_username" type="text" placeholder="Nazwa użytkownika"/> 
                 <button @click="change_username">Zapisz</button>
             </div>
             <div v-else class="row setting">
