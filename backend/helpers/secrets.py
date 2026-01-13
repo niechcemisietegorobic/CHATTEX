@@ -31,3 +31,17 @@ def get_root_invite():
         raise e
     secret = json.loads(secret_value_response['SecretString'])['INVITE_CODE']
     return secret
+
+def get_elasticache_credentials():
+    secret_name = f"{"dev" if is_dev() else "prod"}/chattex/valkey-cache"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name="us-east-1"
+    )
+    try:
+        secret_value_response = client.get_secret_value(SecretId=secret_name)
+    except ClientError as e:
+        raise e
+    secret = json.loads(secret_value_response['SecretString'])
+    return secret

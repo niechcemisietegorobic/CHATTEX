@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = get_django_secret_key()
 
 db.init_app(app)
 socket.init_app(app)
-if (is_dev): CORS(app, origins=["https://dev.chattex.cyanjnpr.dev"])
+if (is_dev()): CORS(app, origins=["https://dev.chattex.cyanjnpr.dev"])
 else: CORS(app, origins=["https://chattex.cyanjnpr.dev"])
 
 app.register_blueprint(auth_blueprint)
