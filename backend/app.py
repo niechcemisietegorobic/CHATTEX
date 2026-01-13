@@ -12,10 +12,12 @@ from websock import socket
 
 app = Flask(__name__)
 rds_credentials = get_rds_credentials()
+# FIXME: move to env
+db_url = ("database-chattex-dev.cu70u6808qco.us-east-1.rds.amazonaws.com" 
+    if is_dev() else "database-chattex-prod.cu70u6808qco.us-east-1.rds.amazonaws.com")
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://{}:{}@{}:5432/chattex".format(
     rds_credentials.get("username"), rds_credentials.get("password"), 
-    "database-chattex-dev.cu70u6808qco.us-east-1.rds.amazonaws.com")#os.environ.get('RDS_URL'))
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+    db_url)#os.environ.get('RDS_URL'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = get_django_secret_key()
 
