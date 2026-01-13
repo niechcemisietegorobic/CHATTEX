@@ -45,3 +45,20 @@ def get_elasticache_credentials():
         raise e
     secret = json.loads(secret_value_response['SecretString'])
     return secret
+
+def get_rds_credentials():
+    if is_dev():
+        secret_name = "rds!db-7100b52e-a618-4040-8b17-3328662ca574"
+    else:
+        secret_name = "rds!db-031ba410-5b94-4baa-8ba4-11fc40e9f598"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name="us-east-1"
+    )
+    try:
+        secret_value_response = client.get_secret_value(SecretId=secret_name)
+    except ClientError as e:
+        raise e
+    secret = json.loads(secret_value_response['SecretString'])
+    return secret

@@ -7,11 +7,15 @@ from routes import (
     forum_blueprint, auth_blueprint, health_blueprint,
     settings_blueprint
     )
-from helpers import get_django_secret_key, is_dev
+from helpers import get_django_secret_key, is_dev, get_rds_credentials
 from websock import socket
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+rds_credentials = get_rds_credentials()
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://{}:{}@{}:5432/chattex".format(
+    rds_credentials.get("username"), rds_credentials.get("password"), 
+    os.environ.get('DATABASE_URL'))
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = get_django_secret_key()
 
