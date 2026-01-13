@@ -8,9 +8,7 @@ import AppFooter from './components/AppFooter.vue';
 <template>
   <div class="app-shell">
     <AppHeader />
-
     <MainContainer />
-
     <AppFooter />
   </div>
 </template>

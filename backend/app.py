@@ -1,34 +1,34 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from models import db
-from routes import public_messages_blueprint, private_messages_blueprint, forum_blueprint, auth_blueprint
+from routes import (
+    public_messages_blueprint, private_messages_blueprint, 
+    forum_blueprint, auth_blueprint, health_blueprint,
+    settings_blueprint
+    )
+from helpers import get_django_secret_key, is_dev
 from websock import socket
 
-app = Flask(__name__
-    # static_folder='static',
-    # static_url_path='/'
-    )
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
+app.config['SECRET_KEY'] = get_django_secret_key()
 
 db.init_app(app)
 socket.init_app(app)
-CORS(app)#, origins=["https://dev.chattex.cyanjnpr.dev", "https://chattex.cyanjnpr.dev"])
+if (is_dev): CORS(app, origins=["https://dev.chattex.cyanjnpr.dev"])
+else: CORS(app, origins=["https://chattex.cyanjnpr.dev"])
 
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(public_messages_blueprint)
 app.register_blueprint(private_messages_blueprint)
 app.register_blueprint(forum_blueprint)
+app.register_blueprint(health_blueprint)
+app.register_blueprint(settings_blueprint)
 
 with app.app_context():
     db.create_all()
-
-@app.route('/health', methods=['GET'])
-def health():
-    # Sprawdzenie czy backend działa
-    return jsonify({"status": "ok"}), 200
 
 if __name__ == '__main__':
     socket.run(app, host='0.0.0.0', port=5000)

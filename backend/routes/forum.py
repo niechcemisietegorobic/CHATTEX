@@ -1,11 +1,10 @@
 from models import PostReaction, ForumComment, ForumPost, User, db
 from flask import request, jsonify, Blueprint
-from helpers import _auth_user_id
+from helpers import auth_user_id
 from websock import socket_sessions, socket
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
-# ---------- FORUM (posty komentarze emoji jako reakcje) ----------
 def _reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}
@@ -46,7 +45,7 @@ def forum_get_posts():
 @forum_blueprint.route('/api/forum/posts', methods=['POST'])
 def forum_add_post():
     #dodawanie wlasnego posta
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 
@@ -75,7 +74,7 @@ def forum_add_post():
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
 def forum_add_comment():
     # komentarze
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 
@@ -105,7 +104,7 @@ def forum_add_comment():
 @forum_blueprint.route('/api/forum/reactions', methods=['POST'])
 def forum_toggle_reaction():
     # emoji
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 

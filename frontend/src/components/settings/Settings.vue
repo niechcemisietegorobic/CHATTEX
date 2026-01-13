@@ -1,7 +1,59 @@
 <script lang="ts" setup>
-const props = defineProps(["username"]);
+import { API_URL, tokenHeader } from '@/constants';
+import { ref } from 'vue';
 
+const props = defineProps(["username"]);
+const emit = defineEmits(["updateUsername"]);
+
+const is_changing_username = ref(false);
+const changed_username = ref(props.username);
+const invite_code = ref('');
 const bg = new URL('@/assets/background.png', import.meta.url).href
+
+async function change_username() {
+    is_changing_username.value = false;
+    
+    const r = await fetch(`${API_URL}/api/user/username`, {
+        method: 'POST',
+        headers: tokenHeader(),
+        body: JSON.stringify({ username: changed_username.value })
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Zmiana nazwy użytkownika zakończona niepowodzeniem.');
+        return;
+    }
+    emit("updateUsername", changed_username.value);
+}
+
+async function fetch_invite_code() {
+    const r = await fetch(`${API_URL}/api/user/invite`, {
+        headers: tokenHeader()
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Nie udało się uzyskać kodu zaproszenia.');
+        return;
+    }
+
+    invite_code.value = data.code;
+}
+
+async function refresh_invite_code() {
+    const r = await fetch(`${API_URL}/api/user/invite`, {
+        method: "POST",
+        headers: tokenHeader()
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Nie udało się odświeżyć kodu zaproszenia.');
+        return;
+    }
+
+    invite_code.value = data.code;
+}
+
+fetch_invite_code();
 </script>
 
 <template>
@@ -9,12 +61,20 @@ const bg = new URL('@/assets/background.png', import.meta.url).href
         <div class="panel">
             <div class="panel-title">Ustawienia</div>
 
-            <div class="row setting">
-                Nazwa użytkownika: {{ props.username }}
+            <div v-if="is_changing_username" class="row setting">
+                Nowa nazwa użytkownika: <input v-model="changed_username" type="text" placeholder="Nazwa użytkownika"/> 
+                <button @click="change_username">Zapisz</button>
+            </div>
+            <div v-else class="row setting">
+                Nazwa użytkownika: {{ props.username }} <button @click="is_changing_username = true">Zmień</button>
             </div>
 
             <div class="row setting">
-                <span>Tło aplikacji <button>Zmień</button></span>
+                <span>Twój kod zaproszenia: {{ invite_code }} <button @click="refresh_invite_code">Odśwież</button></span>
+            </div>
+
+            <div class="row setting">
+                <span>Tło aplikacji</span>
                 <img :src="bg" />
             </div>
 
@@ -36,7 +96,7 @@ const bg = new URL('@/assets/background.png', import.meta.url).href
 }
 
 img {
-    width: 100%;
+    width: 50%;
     height: 100%;
     object-fit: contain;
 }

@@ -24,7 +24,9 @@ socket.on("public_message", (msg) => {
 });
 
 async function refreshPublic() {
-  const r = await fetch(`${API_URL}/api/public/messages`);
+  const r = await fetch(`${API_URL}/api/public/messages`, {
+    headers: tokenHeader(),
+  });
   const list = await r.json();
 
   messages.value = list;
@@ -74,7 +76,7 @@ refreshPublic();
 </template>
 
 <style scoped>
-.panel-title{
+.panel-title {
   font-weight: 800;
   margin-bottom: 8px;
 }

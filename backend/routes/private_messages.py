@@ -1,14 +1,13 @@
 from models import PrivateMessage, User, db
 from flask import request, jsonify, Blueprint
-from helpers import _auth_user_id, _user_by_username
+from helpers import auth_user_id, user_by_username
 from websock import socket, socket_sessions
 
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
-# ---------- PRIVATE (DM) ----------
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
 def private_get():
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 
@@ -16,7 +15,7 @@ def private_get():
     if not with_user:
         return jsonify({'error': 'Podaj ?with=username'}), 400
 
-    other = _user_by_username(with_user)
+    other = user_by_username(with_user)
     if not other:
         return jsonify({'error': 'Nie ma takiego użytkownika'}), 404
 
@@ -41,7 +40,7 @@ def private_get():
 
 @private_messages_blueprint.route('/api/private/messages', methods=['POST'])
 def private_post():
-    uid = _auth_user_id()
+    uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 
@@ -51,7 +50,7 @@ def private_post():
     if not to_user or not content:
         return jsonify({'error': 'Wymagane: to, content'}), 400
 
-    other = _user_by_username(to_user)
+    other = user_by_username(to_user)
     if not other:
         return jsonify({'error': 'Nie ma takiego użytkownika'}), 404
 
