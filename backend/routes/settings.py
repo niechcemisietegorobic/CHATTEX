@@ -43,7 +43,7 @@ def get_invite():
     })
 
 @settings_blueprint.route("/api/user/invite", methods=["POST"])
-def get_invite():
+def refresh_invite():
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}),
