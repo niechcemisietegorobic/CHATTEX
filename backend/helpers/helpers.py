@@ -2,6 +2,8 @@ import jwt
 from flask import request, current_app
 import os
 from models import User
+import random
+import string
 
 #  -------------------- FUNKCJE POMOCNICZE --------------------
 def auth_user_id():
@@ -33,3 +35,7 @@ def user_by_username(username: str):
 
 def is_dev():
     return os.environ.get('IS_DEV', 'false').lower() == 'true'
+
+def random_invite_code():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=8))

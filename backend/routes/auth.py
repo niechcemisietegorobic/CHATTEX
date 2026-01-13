@@ -3,11 +3,17 @@ from flask import request, jsonify, Blueprint, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
-from helpers import get_root_invite
+from helpers import get_root_invite, random_invite_code
 
 ROOT_INVITE = get_root_invite()
 
 auth_blueprint = Blueprint("auth_blueprint", __name__)
+
+# generate invite code bound to the account, allowing trusted user to invite new people onto the platform
+def generate_user_account_invite(user_id: int):
+    i = Invite(user_id=user_id, code=random_invite_code())
+    db.session.add(i)
+    db.session.commit()
 
 @auth_blueprint.route('/api/register', methods=['POST'])
 def register():
@@ -30,6 +36,7 @@ def register():
     u = User(username=username, password_hash=generate_password_hash(password), invited_by_id=None if not invite else invite.user_id)
     db.session.add(u)
     db.session.commit()
+    generate_user_account_invite(u.id)
     return jsonify({'message': 'Rejestracja udana'}), 201
 
 @auth_blueprint.route('/api/login', methods=['POST'])
