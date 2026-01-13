@@ -14,7 +14,7 @@ app = Flask(__name__)
 rds_credentials = get_rds_credentials()
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://{}:{}@{}:5432/chattex".format(
     rds_credentials.get("username"), rds_credentials.get("password"), 
-    os.environ.get('RDS_URL'))
+    "database-chattex-dev.cu70u6808qco.us-east-1.rds.amazonaws.com")#os.environ.get('RDS_URL'))
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = get_django_secret_key()

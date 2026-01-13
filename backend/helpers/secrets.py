@@ -48,9 +48,9 @@ def get_elasticache_credentials():
 
 def get_rds_credentials():
     if is_dev():
-        secret_name = "rds!db-7100b52e-a618-4040-8b17-3328662ca574"
+        secret_name = "rds!db-1f639054-c2d5-49ad-825a-215bde1cb794"
     else:
-        secret_name = "rds!db-031ba410-5b94-4baa-8ba4-11fc40e9f598"
+        secret_name = "rds!db-8b2910b1-7e1d-4238-a860-1fc3ef9769f6"
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
