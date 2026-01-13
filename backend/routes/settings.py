@@ -1,6 +1,6 @@
 from models import User, Invite, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id
+from helpers import auth_user_id, random_invite_code
 
 settings_blueprint = Blueprint("settings_blueprint", __name__)
 
@@ -36,6 +36,24 @@ def get_invite():
     invite = Invite.query.filter_by(user_id=uid).first()
     if not invite:
         return jsonify({'error': 'Brak zaproszenia'}), 401
+    
+    return jsonify({
+        'user_id': invite.user_id,
+        'code': invite.code
+    })
+
+@settings_blueprint.route("/api/user/invite", methods=["POST"])
+def get_invite():
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}),
+    invite = Invite.query.filter_by(user_id=uid).first()
+    if not invite:
+        invite = Invite(user_id=uid, code=random_invite_code())
+        db.session.add(invite)
+    else:
+        invite.code = random_invite_code()
+    db.session.commit()
     
     return jsonify({
         'user_id': invite.user_id,

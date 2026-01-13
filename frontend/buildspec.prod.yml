@@ -27,7 +27,3 @@ phases:
       - aws s3 sync dist/ s3://chattex-frontend-prod/ --cache-control "public, max-age=604800, immutable" --exclude "index.html"
       - aws s3 cp dist/index.html s3://chattex-frontend-prod/index.html --cache-control "public, max-age=300"
 
-# artifacts:
-#   files:
-#     - '**/*'
-#   base-directory: frontend/dist
