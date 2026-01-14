@@ -2,6 +2,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from .helpers import is_dev
+import os
 
 def get_django_secret_key():
     secret_name = f"{"dev" if is_dev() else "prod"}/chattex/django_secret_key"
@@ -30,4 +31,18 @@ def get_root_invite():
     except ClientError as e:
         raise e
     secret = json.loads(secret_value_response['SecretString'])['INVITE_CODE']
+    return secret
+
+def get_rds_credentials():
+    secret_name = os.environ.get("RDS_SECRET")
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name="us-east-1"
+    )
+    try:
+        secret_value_response = client.get_secret_value(SecretId=secret_name)
+    except ClientError as e:
+        raise e
+    secret = json.loads(secret_value_response['SecretString'])
     return secret

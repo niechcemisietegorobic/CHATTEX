@@ -4,6 +4,8 @@ import { ref, type Ref, onUnmounted, nextTick } from 'vue';
 import { io } from 'socket.io-client';
 import ChatMessage from './ChatMessage.vue';
 
+const props = defineProps(["username"]);
+
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
 const dm: Ref<any> = ref([]);
@@ -42,10 +44,9 @@ async function sendDM() {
 async function refreshUsers() {
     const r = await fetch(`${API_URL}/api/users`);
     const list: any[] = await r.json();
-    const me = localStorage.getItem('username');
 
     //w dm pokazuje kazdego opocz mnie
-    users.value = list.filter(u => u !== me);
+    users.value = list.filter(u => u !== props.username);
 }
 
 function scrollChatBox() {

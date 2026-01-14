@@ -34,7 +34,7 @@ function updateUsername(val: string) {
 
         <PublicChat v-if="active_tab == 'public'" />
 
-        <PrivateChat v-else-if="active_tab == 'private'" />
+        <PrivateChat v-else-if="active_tab == 'private'" :username="props.username" />
 
         <Forum v-else-if="active_tab == 'forum'" />
 

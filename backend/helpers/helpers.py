@@ -5,7 +5,6 @@ from models import User
 import random
 import string
 
-#  -------------------- FUNKCJE POMOCNICZE --------------------
 def auth_user_id():
     # Sprawdza token JWT i zwraca id użytkownika
     auth_header = request.headers.get('Authorization')

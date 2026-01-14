@@ -1,7 +1,7 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id
-from websock import socket, socket_sessions
+from websock import socket, send_to_all_except
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
@@ -11,7 +11,7 @@ def public_get():
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     # Pobiera wiadomości z publicznego czatu
-    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.asc()).all()
+    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.desc()).limit(100).all()
     out = []
     for m in msgs:
         u = User.query.get(m.user_id)
@@ -21,6 +21,7 @@ def public_get():
             'content': m.content,
             'timestamp': m.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
+    out.reverse()
     return jsonify(out), 200
 
 @public_messages_blueprint.route('/api/public/messages', methods=['POST'])
@@ -43,5 +44,5 @@ def public_post():
         'content': msg.content,
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
-    [socket.emit("public_message", response, to=k) for k, v in socket_sessions.items() if v != msg.user_id]
+    send_to_all_except(msg.user_id, "public_message", response)
     return jsonify(response), 201
