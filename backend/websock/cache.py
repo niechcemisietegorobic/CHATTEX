@@ -11,13 +11,11 @@ def init_glide():
 cache: GlideClusterClient = init_glide()
 
 def get_all_keys():
-    cursor = ClusterScanCursor("0")
+    cursor = ClusterScanCursor()
     all_keys = []
-    while True:
+    while not cursor.is_finished():
         cursor, keys = cache.scan(cursor)
         all_keys.extend(keys)
-        if cursor.get_cursor() == b"0":
-            break
     return all_keys
 
 def get_all_key_values():
