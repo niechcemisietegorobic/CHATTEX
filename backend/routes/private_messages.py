@@ -1,7 +1,7 @@
 from models import PrivateMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id, user_by_username
-from websock import socket, socket_sessions, send_only_to
+from websock import socket, send_only_to
 
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 

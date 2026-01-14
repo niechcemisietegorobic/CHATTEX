@@ -2,6 +2,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from .helpers import is_dev
+import os
 
 def get_django_secret_key():
     secret_name = f"{"dev" if is_dev() else "prod"}/chattex/django_secret_key"
@@ -33,10 +34,11 @@ def get_root_invite():
     return secret
 
 def get_rds_credentials():
-    if is_dev():
-        secret_name = "rds!db-1f639054-c2d5-49ad-825a-215bde1cb794"
-    else:
-        secret_name = "rds!db-8b2910b1-7e1d-4238-a860-1fc3ef9769f6"
+    secret_name = os.environ.get("RDS_SECRET")
+    # if is_dev():
+    #     secret_name = "rds!db-1f639054-c2d5-49ad-825a-215bde1cb794"
+    # else:
+    #     secret_name = "rds!db-8b2910b1-7e1d-4238-a860-1fc3ef9769f6"
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',

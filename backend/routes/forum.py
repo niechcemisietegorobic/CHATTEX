@@ -1,7 +1,7 @@
 from models import PostReaction, ForumComment, ForumPost, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id
-from websock import socket_sessions, socket, send_to_all_except
+from websock import socket, send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 

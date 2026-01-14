@@ -5,7 +5,6 @@ from .cache import cache, get_all_key_values
 
 socket = SocketIO(cors_allowed_origins="*")
 
-socket_sessions = {}
 
 def send_to_all_except(user_id: int, event: str, data):
     keyvals = get_all_key_values()
@@ -21,9 +20,7 @@ def handle_connect(data):
         user_id = socket_auth_user_id(data["token"])
         if (user_id is not None):
             cache.set(request.sid, str(user_id))
-            # socket_sessions[request.sid] = user_id
 
 @socket.on("disconnect")
 def handle_disconnect():
     cache.delete([request.sid])
-    # del socket_sessions[request.sid]

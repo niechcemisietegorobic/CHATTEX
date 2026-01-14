@@ -1,8 +1,10 @@
 from glide_sync import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient, ClusterScanCursor
+import os
 
 def init_glide():
     addresses = [
-        NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com", 6379)
+        NodeAddress(os.environ.get("CACHE_URL"), 6379)
+        # NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com", 6379)
     ]
     config = GlideClusterClientConfiguration(addresses=addresses, use_tls=True)
     glide_client = GlideClusterClient.create(config)

@@ -1,7 +1,7 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id
-from websock import socket, socket_sessions, send_to_all_except
+from websock import socket, send_to_all_except
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
