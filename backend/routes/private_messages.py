@@ -24,7 +24,7 @@ def private_get():
             db.and_(PrivateMessage.sender_id == uid, PrivateMessage.receiver_id == other.id),
             db.and_(PrivateMessage.sender_id == other.id, PrivateMessage.receiver_id == uid)
         )
-    ).order_by(PrivateMessage.timestamp.asc()).all()
+    ).order_by(PrivateMessage.timestamp.desc()).limit(100).all()
 
     out = []
     for m in msgs:
@@ -36,6 +36,7 @@ def private_get():
             'content': m.content,
             'timestamp': m.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
+    out.reverse()
     return jsonify(out), 200
 
 @private_messages_blueprint.route('/api/private/messages', methods=['POST'])
@@ -66,7 +67,6 @@ def private_post():
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
     send_only_to(other.id, "private_message", response)
-    # [socket.emit("private_message", response, to=k) for k, v in socket_sessions.items() if v == other.id]
     return jsonify(response), 201
 
 @private_messages_blueprint.route('/api/users', methods=['GET'])

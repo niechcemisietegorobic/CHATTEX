@@ -11,7 +11,7 @@ def public_get():
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     # Pobiera wiadomości z publicznego czatu
-    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.asc()).all()
+    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.desc()).limit(100).all()
     out = []
     for m in msgs:
         u = User.query.get(m.user_id)
@@ -21,6 +21,7 @@ def public_get():
             'content': m.content,
             'timestamp': m.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
+    out.reverse()
     return jsonify(out), 200
 
 @public_messages_blueprint.route('/api/public/messages', methods=['POST'])
@@ -44,5 +45,4 @@ def public_post():
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
     send_to_all_except(msg.user_id, "public_message", response)
-    # [socket.emit("public_message", response, to=k) for k, v in socket_sessions.items() if v != msg.user_id]
     return jsonify(response), 201
