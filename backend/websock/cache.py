@@ -10,20 +10,20 @@ def init_glide():
 
 cache: GlideClusterClient = init_glide()
 
-async def get_all_keys():
+def get_all_keys():
     cursor = "0"
     all_keys = []
     while True:
-        cursor, keys = await cache.scan(cursor)
+        cursor, keys = cache.scan(cursor)
         all_keys.extend(keys)
         if cursor == b"0":
             break
     return all_keys
 
-async def get_all_key_values():
-    keys = await get_all_keys()
+def get_all_key_values():
+    keys = get_all_keys()
     result = {}
     for key in keys:
-        value = await cache.get(key)
+        value = cache.get(key)
         result[key.decode()] = value.decode() if value else None
     return result

@@ -32,20 +32,6 @@ def get_root_invite():
     secret = json.loads(secret_value_response['SecretString'])['INVITE_CODE']
     return secret
 
-def get_elasticache_credentials():
-    secret_name = f"{"dev" if is_dev() else "prod"}/chattex/valkey-cache"
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name="us-east-1"
-    )
-    try:
-        secret_value_response = client.get_secret_value(SecretId=secret_name)
-    except ClientError as e:
-        raise e
-    secret = json.loads(secret_value_response['SecretString'])
-    return secret
-
 def get_rds_credentials():
     if is_dev():
         secret_name = "rds!db-1f639054-c2d5-49ad-825a-215bde1cb794"

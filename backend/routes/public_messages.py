@@ -1,7 +1,7 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id
-from websock import socket, socket_sessions
+from websock import socket, socket_sessions, send_to_all_except
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
@@ -43,5 +43,6 @@ def public_post():
         'content': msg.content,
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
-    [socket.emit("public_message", response, to=k) for k, v in socket_sessions.items() if v != msg.user_id]
+    send_to_all_except(msg.user_id, "public_message", response)
+    # [socket.emit("public_message", response, to=k) for k, v in socket_sessions.items() if v != msg.user_id]
     return jsonify(response), 201
