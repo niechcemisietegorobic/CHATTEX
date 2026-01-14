@@ -14,14 +14,15 @@ def send_only_to(user_id: int, event: str, data):
     pass
 
 @socket.on("connect")
-async def handle_connect(data):
+def handle_connect(data):
     if (data is not None and data["token"] is not None):
         user_id = socket_auth_user_id(data["token"])
         if (user_id is not None):
+            socket.emit("CACHE SET", request.sid, to=request.sid)
             cache.set(request.sid, str(user_id))
             socket_sessions[request.sid] = user_id
-#
+
 @socket.on("disconnect")
-async def handle_disconnect():
-    cache.delete(request.sid)
+def handle_disconnect():
+    # cache.delete(request.sid)
     del socket_sessions[request.sid]
