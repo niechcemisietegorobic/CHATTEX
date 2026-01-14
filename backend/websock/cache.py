@@ -6,7 +6,7 @@ def init_glide():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     addresses = [
-        NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com:6379", 6379)
+        NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com", 6379)
     ]
     creds = get_elasticache_credentials()
     credentials = ServerCredentials(creds.get("PASSWORD"), creds.get("USER"))
