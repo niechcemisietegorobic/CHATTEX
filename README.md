@@ -37,6 +37,12 @@ frontend/
 
 ## ☁️ Docelowa architektura chmurowa (AWS)
 
+### Schemat infrastruktury
+
+### Schemat CI/CD
+
+![CI/CD pipeline graph](.github/ci_cd.png "CI/CD pipeline graph")
+
 Projekt jest przygotowany pod wdrożenie w chmurze AWS:
 - Application Load Balancer (public subnet),
 - EC2 (Auto Scaling Group, private subnet),
