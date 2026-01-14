@@ -1,7 +1,7 @@
 from models import PrivateMessage, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id, user_by_username
-from websock import socket, socket_sessions
+from websock import socket, socket_sessions, send_only_to
 
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
@@ -65,7 +65,8 @@ def private_post():
         'content': msg.content,
         'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
-    [socket.emit("private_message", response, to=k) for k, v in socket_sessions.items() if v == other.id]
+    send_only_to(other.id, "private_message", response)
+    # [socket.emit("private_message", response, to=k) for k, v in socket_sessions.items() if v == other.id]
     return jsonify(response), 201
 
 @private_messages_blueprint.route('/api/users', methods=['GET'])

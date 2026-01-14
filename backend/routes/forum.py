@@ -1,7 +1,7 @@
 from models import PostReaction, ForumComment, ForumPost, User, db
 from flask import request, jsonify, Blueprint
 from helpers import auth_user_id
-from websock import socket_sessions, socket
+from websock import socket_sessions, socket, send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
@@ -68,7 +68,8 @@ def forum_add_post():
         'reactions': _reaction_counts_for_post(p.id),
         'comments': _comments_for_post(p.id),
     }
-    [socket.emit("forum_post", response, to=k) for k, v in socket_sessions.items() if v != p.author_id]
+    send_to_all_except(p.author_id, "forum_post", response)
+    # [socket.emit("forum_post", response, to=k) for k, v in socket_sessions.items() if v != p.author_id]
     return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
@@ -98,7 +99,8 @@ def forum_add_comment():
         'body': c.body,
         'timestamp': c.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     }
-    [socket.emit("forum_comment", {'post_id': p.id, 'comment': response}, to=k) for k, v in socket_sessions.items() if v != c.author_id]
+    send_to_all_except(c.author_id, "forum_comment", {'post_id': p.id, 'comment': response})
+    # [socket.emit("forum_comment", {'post_id': p.id, 'comment': response}, to=k) for k, v in socket_sessions.items() if v != c.author_id]
     return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/reactions', methods=['POST'])
@@ -126,5 +128,6 @@ def forum_toggle_reaction():
     db.session.commit()
 
     response = _reaction_counts_for_post(p.id)
-    [socket.emit("forum_reactions", {'post_id': p.id, 'reactions': response}, to=k) for k, v in socket_sessions.items() if v != uid]
+    send_to_all_except(uid, "forum_reactions", {'post_id': p.id, 'reactions': response})
+    # [socket.emit("forum_reactions", {'post_id': p.id, 'reactions': response}, to=k) for k, v in socket_sessions.items() if v != uid]
     return jsonify(response), 200
