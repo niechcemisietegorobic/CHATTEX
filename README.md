@@ -39,6 +39,8 @@ frontend/
 
 ### Schemat infrastruktury
 
+![AWS Cloud Architecture Diagram](.github/Chattex_Cloud_Structure.jpg "AWS Cloud Architecture Diagram")
+
 ### Schemat CI/CD
 
 ![CI/CD pipeline graph](.github/ci_cd.png "CI/CD pipeline graph")
