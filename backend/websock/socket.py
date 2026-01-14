@@ -25,5 +25,5 @@ def handle_connect(data):
 
 @socket.on("disconnect")
 def handle_disconnect():
-    cache.delete(request.sid)
+    cache.delete([request.sid])
     del socket_sessions[request.sid]

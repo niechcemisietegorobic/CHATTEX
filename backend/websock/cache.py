@@ -1,4 +1,4 @@
-from glide_sync import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient
+from glide_sync import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient, ClusterScanCursor
 
 def init_glide():
     addresses = [
@@ -11,12 +11,12 @@ def init_glide():
 cache: GlideClusterClient = init_glide()
 
 def get_all_keys():
-    cursor = "0"
+    cursor = ClusterScanCursor("0")
     all_keys = []
     while True:
         cursor, keys = cache.scan(cursor)
         all_keys.extend(keys)
-        if cursor == b"0":
+        if cursor.get_cursor() == b"0":
             break
     return all_keys
 
