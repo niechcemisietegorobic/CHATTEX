@@ -1,16 +1,11 @@
-from glide import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient, ServerCredentials
-import asyncio
+from glide_sync import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient
 
 def init_glide():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
     addresses = [
         NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com", 6379)
     ]
     config = GlideClusterClientConfiguration(addresses=addresses, use_tls=True)
-    glide_client = loop.run_until_complete(
-       GlideClusterClient.create(config)
-    )
+    glide_client = GlideClusterClient.create(config)
     return glide_client
 
 cache: GlideClusterClient = init_glide()

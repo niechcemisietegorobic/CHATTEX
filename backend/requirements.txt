@@ -8,4 +8,4 @@ gevent==25.9.1
 botocore==1.42.23
 boto3==1.42.23
 psycopg2-binary==2.9.11
-valkey-glide==2.2.5
+valkey-glide-sync==2.2.5
