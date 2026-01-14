@@ -1,6 +1,5 @@
 from glide import NodeAddress, GlideClusterClientConfiguration, GlideClusterClient, ServerCredentials
 import asyncio
-from helpers import get_elasticache_credentials
 
 def init_glide():
     loop = asyncio.new_event_loop()
@@ -8,9 +7,7 @@ def init_glide():
     addresses = [
         NodeAddress("chattex-sessions-dev-vpx3rr.serverless.use1.cache.amazonaws.com", 6379)
     ]
-    creds = get_elasticache_credentials()
-    credentials = ServerCredentials(creds.get("PASSWORD"), creds.get("USER"))
-    config = GlideClusterClientConfiguration(credentials=credentials, addresses=addresses, use_tls=True)
+    config = GlideClusterClientConfiguration(addresses=addresses, use_tls=True)
     glide_client = loop.run_until_complete(
        GlideClusterClient.create(config)
     )
