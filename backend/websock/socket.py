@@ -20,7 +20,7 @@ async def handle_connect(data):
         if (user_id is not None):
             cache.set(request.sid, str(user_id))
             socket_sessions[request.sid] = user_id
-
+#
 @socket.on("disconnect")
 async def handle_disconnect():
     cache.delete(request.sid)
