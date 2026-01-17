@@ -46,5 +46,12 @@ def check_environment():
         os.environ.get("CACHE_URL") and
         os.environ.get("RDS_SECRET") and
         os.environ.get("FRONTEND_URL") and
-        os.environ.get("MEDIA_BUCKET") 
+        os.environ.get("MEDIA_BUCKET") and
+        os.environ.get("REGION") 
     ) is not None
+
+def media_bucket_url(filename):
+    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/{filename}"
+
+def default_background_url():
+    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/backgrounds/default.png"

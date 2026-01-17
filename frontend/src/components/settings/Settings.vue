@@ -23,6 +23,7 @@ async function change_background(event: any) {
     formData.append('file', file);
     const r = await fetch(`${API_URL}/api/user/background`, {
         method: 'POST',
+        headers: tokenHeader(),
         body: formData
     });
     const data = await r.json();

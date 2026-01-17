@@ -37,4 +37,4 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    socket.run(app, host='0.0.0.0', port=5000)
+    print("run in a container, quitting...")

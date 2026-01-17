@@ -59,3 +59,9 @@ class Invite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     code = db.Column(db.String(8), nullable=False)
+
+class Background(db.Model):
+    __tablename__ = "user_backgrounds"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    url = db.Column(db.String(256), nullable=False)

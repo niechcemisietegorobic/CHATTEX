@@ -1,6 +1,6 @@
-from models import User, Invite, db
+from models import User, Invite, Background, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id, random_invite_code, limiter
+from helpers import auth_user_id, random_invite_code, limiter, default_background_url, media_bucket_url
 import boto3
 from botocore.exceptions import ClientError
 import hashlib
@@ -12,6 +12,9 @@ settings_blueprint = Blueprint("settings_blueprint", __name__)
 @settings_blueprint.route('/api/user/background', methods=['POST'])
 @limiter.limit("3 per hour")
 def change_background():
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     if 'file' not in request.files:
         return jsonify({"error": "Zmiana tła nieudana"}), 400
     file = request.files['file']
@@ -36,13 +39,28 @@ def change_background():
     session = boto3.session.Session()
     client = session.client(
         service_name='s3',
-        region_name="us-east-1"
+        region_name=os.environ.get("REGION")
     )
     try:
         client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
     except ClientError:
         return jsonify({"error": "Zmiana tła nieudana"}), 400
-    return jsonify({"filename": s3_filename}), 200
+    bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
+    db.session.add(bg)
+    db.session.commit()
+    return jsonify({"url": bg.url}), 200
+
+
+@settings_blueprint.route('/api/user/background', methods=['GET'])
+@limiter.limit("10 per 10 seconds")
+def get_background():
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    bg = Background.query.filter_by(user_id=uid).first()
+    if not bg:
+        return jsonify({'url': default_background_url()}), 200
+    return jsonify({'url': bg.url}), 200
 
 
 @settings_blueprint.route('/api/user/username', methods=['POST'])
@@ -83,14 +101,15 @@ def get_invite():
     return jsonify({
         'user_id': invite.user_id,
         'code': invite.code
-    })
+    }), 200
+
 
 @settings_blueprint.route("/api/user/invite", methods=["POST"])
 @limiter.limit("3 per minute")
 def refresh_invite():
     uid = auth_user_id()
     if not uid:
-        return jsonify({'error': 'Brak/nieprawidłowy token'}),
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     invite = Invite.query.filter_by(user_id=uid).first()
     if not invite:
         invite = Invite(user_id=uid, code=random_invite_code())
@@ -102,4 +121,4 @@ def refresh_invite():
     return jsonify({
         'user_id': invite.user_id,
         'code': invite.code
-    })
+    }), 200
