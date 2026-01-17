@@ -7,7 +7,7 @@ from routes import (
     forum_blueprint, auth_blueprint, health_blueprint,
     settings_blueprint
     )
-from helpers import get_django_secret_key, is_dev, get_rds_credentials
+from helpers import get_django_secret_key, get_rds_credentials, limiter
 from websock import socket
 
 app = Flask(__name__)
@@ -20,8 +20,8 @@ app.config['SECRET_KEY'] = get_django_secret_key()
 
 db.init_app(app)
 socket.init_app(app)
-if (is_dev()): CORS(app, origins=["https://dev.chattex.cyanjnpr.dev"])
-else: CORS(app, origins=["https://chattex.cyanjnpr.dev"])
+limiter.init_app(app)
+CORS(app, origins=[os.environ.get("FRONTEND_URL")])
 
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(public_messages_blueprint)

@@ -3,7 +3,7 @@ from flask import request, jsonify, Blueprint, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
-from helpers import get_root_invite, random_invite_code
+from helpers import get_root_invite, random_invite_code, limiter
 
 ROOT_INVITE = get_root_invite()
 
@@ -16,6 +16,7 @@ def generate_user_account_invite(user_id: int):
     db.session.commit()
 
 @auth_blueprint.route('/api/register', methods=['POST'])
+@limiter.limit("10 per hour")
 def register():
     # Rejestracja nowego użytkownika
     data = request.get_json() or {}
