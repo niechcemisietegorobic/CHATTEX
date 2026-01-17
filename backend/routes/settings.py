@@ -1,10 +1,52 @@
 from models import User, Invite, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id, random_invite_code
+from helpers import auth_user_id, random_invite_code, limiter
+import boto3
+from botocore.exceptions import ClientError
+import hashlib
+from PIL import Image, UnidentifiedImageError
+import os
 
 settings_blueprint = Blueprint("settings_blueprint", __name__)
 
+@settings_blueprint.route('/api/user/background', methods=['POST'])
+@limiter.limit("3 per hour")
+def change_background():
+    if 'file' not in request.files:
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    file = request.files['file']
+    if (file.filename.find('.') == -1):
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
+
+    try:
+        img = Image.open(file.stream)
+        img.verify()
+    except (UnidentifiedImageError, OSError):
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    file.stream.seek(0)
+    
+    sha256 = hashlib.sha256()
+    while chunk := file.stream.read(4092):
+        sha256.update(chunk)
+    file_hash = sha256.hexdigest()
+    file.stream.seek(0)
+
+    _, ext = os.path.splitext(file.filename)
+    s3_filename = f"backgrounds/{file_hash}{ext}"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='s3',
+        region_name="us-east-1"
+    )
+    try:
+        client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
+    except ClientError:
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    return jsonify({"filename": s3_filename}), 200
+
+
 @settings_blueprint.route('/api/user/username', methods=['POST'])
+@limiter.limit("3 per hour")
 def change_username():
     uid = auth_user_id()
     if not uid:
@@ -29,6 +71,7 @@ def change_username():
 
 
 @settings_blueprint.route("/api/user/invite", methods=["GET"])
+@limiter.limit("10 per 10 seconds")
 def get_invite():
     uid = auth_user_id()
     if not uid:
@@ -43,6 +86,7 @@ def get_invite():
     })
 
 @settings_blueprint.route("/api/user/invite", methods=["POST"])
+@limiter.limit("3 per minute")
 def refresh_invite():
     uid = auth_user_id()
     if not uid:

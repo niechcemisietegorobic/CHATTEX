@@ -50,6 +50,8 @@ W celu poprawnego funkcjonowania aplikacji konieczne jest skonfigurowanie sekret
 | Zmienna  | RDS_URL  | adres bazy PostgreSQL  |
 | Zmienna  | CACHE_URL  | adres ElastiCache  |
 | Zmienna  | RDS_SECRET  | nazwa sekretu przechowującego dane logowania RDS  |
+| Zmienna  | FRONTEND_URL  | adres origin z którego będą wysyłane requesty API  |
+| Zmienna  | MEDIA_BUCKET  | nazwa wiaderka S3 przechowującego media przesłane przez użytkowników  |
 
 
 ---

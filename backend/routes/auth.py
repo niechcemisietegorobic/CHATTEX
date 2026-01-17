@@ -41,6 +41,7 @@ def register():
     return jsonify({'message': 'Rejestracja udana'}), 201
 
 @auth_blueprint.route('/api/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def login():
     # Logowanie i generowanie tokenu JWT
     data = request.get_json() or {}

@@ -7,8 +7,11 @@ from routes import (
     forum_blueprint, auth_blueprint, health_blueprint,
     settings_blueprint
     )
-from helpers import get_django_secret_key, get_rds_credentials, limiter
+from helpers import get_django_secret_key, get_rds_credentials, limiter, check_environment
 from websock import socket
+
+if (not check_environment()):
+    raise RuntimeError("environment is not configured correctly")
 
 app = Flask(__name__)
 rds_credentials = get_rds_credentials()

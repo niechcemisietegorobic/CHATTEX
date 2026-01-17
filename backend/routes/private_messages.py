@@ -1,11 +1,12 @@
 from models import PrivateMessage, User, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id, user_by_username
-from websock import socket, send_only_to
+from helpers import auth_user_id, user_by_username, limiter
+from websock import send_only_to
 
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
+@limiter.limit("12 per minute")
 def private_get():
     uid = auth_user_id()
     if not uid:
@@ -40,6 +41,7 @@ def private_get():
     return jsonify(out), 200
 
 @private_messages_blueprint.route('/api/private/messages', methods=['POST'])
+@limiter.limit("10 per 10 seconds")
 def private_post():
     uid = auth_user_id()
     if not uid:
@@ -70,6 +72,7 @@ def private_post():
     return jsonify(response), 201
 
 @private_messages_blueprint.route('/api/users', methods=['GET'])
+@limiter.limit("12 per minute")
 def list_users():
     # Lista użytkowników (do DM)
     users = User.query.order_by(User.username.asc()).all()

@@ -38,3 +38,13 @@ def is_dev():
 def random_invite_code():
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choices(chars, k=8))
+
+def check_environment():
+    return (
+        os.environ.get("IS_DEV") and
+        os.environ.get("RDS_URL") and
+        os.environ.get("CACHE_URL") and
+        os.environ.get("RDS_SECRET") and
+        os.environ.get("FRONTEND_URL") and
+        os.environ.get("MEDIA_BUCKET") 
+    ) is not None
