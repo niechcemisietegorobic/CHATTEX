@@ -10,7 +10,7 @@ import os
 settings_blueprint = Blueprint("settings_blueprint", __name__)
 
 @settings_blueprint.route('/api/user/background', methods=['POST'])
-@limiter.limit("3 per hour")
+@limiter.limit("6 per hour")
 def change_background():
     uid = auth_user_id()
     if not uid:
@@ -43,13 +43,17 @@ def change_background():
     )
     try:
         client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
-    except ClientError:
-        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    except ClientError as e:
+        return jsonify({"error": str(e)}), 400#"Zmiana tła nieudana"}), 400
     bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
     db.session.add(bg)
     db.session.commit()
     return jsonify({"url": bg.url}), 200
 
+@settings_blueprint.route('/api/background', methods=['GET'])
+@limiter.limit("10 per 10 seconds")
+def get_background():
+    return jsonify({'url': default_background_url()}), 200
 
 @settings_blueprint.route('/api/user/background', methods=['GET'])
 @limiter.limit("10 per 10 seconds")
@@ -105,7 +109,7 @@ def get_invite():
 
 
 @settings_blueprint.route("/api/user/invite", methods=["POST"])
-@limiter.limit("3 per minute")
+@limiter.limit("6 per hour")
 def refresh_invite():
     uid = auth_user_id()
     if not uid:

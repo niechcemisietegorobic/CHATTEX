@@ -9,7 +9,7 @@ const backgroundInput: Ref<any> = ref(null);
 const is_changing_username = ref(false);
 const changed_username = ref(props.username);
 const invite_code = ref('');
-const bg = new URL('@/assets/background.png', import.meta.url).href
+const bg = ref('');
 
 function openBackgroundInput() {
     backgroundInput.value.click();
@@ -31,7 +31,21 @@ async function change_background(event: any) {
         alert(data.error || 'Zmiana tła aplikacji zakończona niepowodzeniem.');
         return;
     }
-    alert("[DEV] success");
+    bg.value = data.url;
+    document.body.style.backgroundImage = `url("${data.url}")`;
+}
+
+async function fetch_background() {
+    const r = await fetch(`${API_URL}/api/user/background`, {
+        headers: tokenHeader()
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Nie udało się uzyskać adresu tła.');
+        return;
+    }
+
+    bg.value = data.url;
 }
 
 async function change_username() {
@@ -78,6 +92,7 @@ async function refresh_invite_code() {
 }
 
 fetch_invite_code();
+fetch_background();
 </script>
 
 <template>
@@ -101,7 +116,7 @@ fetch_invite_code();
 
             <div class="row setting">
                 <span>Tło aplikacji: </span>
-                <div class="img-container">
+                <div v-if="bg.length > 0" class="img-container">
                     <img :src="bg" />
                     <button class="img-button" @click="openBackgroundInput">Zmień</button>
                 </div>
@@ -138,6 +153,8 @@ fetch_invite_code();
 
 img {
     width: min(50%, 512px);
+    min-height: 128px;
+    min-width: 128px;
     height: 100%;
     object-fit: contain;
     border-radius: 14px;
