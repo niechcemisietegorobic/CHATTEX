@@ -4,6 +4,8 @@ import { ref, type Ref, onUnmounted } from 'vue';
 import ForumPost from './ForumPost.vue';
 import { io } from 'socket.io-client';
 
+const emit = defineEmits(["publicNotif", "privateNotif"]);
+
 const posts: Ref<any[], any[]> = ref([]);
 const typed_title = ref('');
 const typed_body = ref('');
@@ -70,6 +72,15 @@ socket.on("forum_reactions", (reactions_response) => {
   if (i != -1) {
     posts.value[i].reactions = (reactions_response.reactions);
   }
+});
+
+socket.on("public_message", () => {
+  emit("publicNotif");
+});
+
+
+socket.on("private_message", () => {
+  emit("privateNotif");
 });
 
 refreshPosts();

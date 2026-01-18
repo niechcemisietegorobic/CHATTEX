@@ -3,6 +3,13 @@
 import AppHeader from './components/AppHeader.vue';
 import MainContainer from './components/MainContainer.vue';
 import AppFooter from './components/AppFooter.vue';
+import { IS_DEV } from './constants';
+
+if (IS_DEV) {
+  // rzułte tło dla wersji dev żeby się nie pomylić
+  document.body.style.backgroundBlendMode = "multiply";
+  document.body.style.backgroundColor = "goldenrod";
+}
 </script>
 
 <template>

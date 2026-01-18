@@ -44,9 +44,10 @@ def check_environment():
         os.environ.get("IS_DEV") and
         os.environ.get("RDS_URL") and
         os.environ.get("CACHE_URL") and
-        os.environ.get("RDS_SECRET") and
+        os.environ.get("RDS_SM") and
         os.environ.get("FRONTEND_URL") and
         os.environ.get("MEDIA_BUCKET") and
+        os.environ.get("MEDIA_URL") and
         os.environ.get("REGION") 
     ) is not None
 

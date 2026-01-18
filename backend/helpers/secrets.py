@@ -34,7 +34,7 @@ def get_root_invite():
     return secret
 
 def get_rds_credentials():
-    secret_name = os.environ.get("RDS_SECRET")
+    secret_name = os.environ.get("RDS_SM")
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',

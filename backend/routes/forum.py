@@ -5,14 +5,14 @@ from websock import send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
-def _reaction_counts_for_post(post_id: int):
+def reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}
     for r in rows:
         counts[r.emoji] = counts.get(r.emoji, 0) + 1
     return counts
 
-def _comments_for_post(post_id: int):
+def comments_for_post(post_id: int):
     rows = ForumComment.query.filter_by(post_id=post_id).order_by(ForumComment.timestamp.desc()).limit(10).all()
     out = []
     for c in rows:
@@ -39,10 +39,26 @@ def forum_get_posts():
             'title': p.title,
             'body': p.body,
             'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-            'reactions': _reaction_counts_for_post(p.id),
-            'comments': _comments_for_post(p.id),
+            'reactions': reaction_counts_for_post(p.id),
+            'comments': comments_for_post(p.id),
         })
     return jsonify(out), 200
+
+
+@forum_blueprint.route('/api/forum/posts/<int:pid>', methods=['DELETE'])
+@limiter.limit("3 per minute")
+def forum_delete_post(pid: int):
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    post = ForumPost.query.filter_by(id=pid).first()
+    if (post.author_id != uid):
+        return jsonify({'error': 'Brak uprawnień'}), 400
+    db.session.delete(post)
+    db.session.commit()
+    send_to_all_except(post.author_id, "forum_post_delete", {'id': pid})
+    return jsonify({'id': pid}), 200
+
 
 @forum_blueprint.route('/api/forum/posts', methods=['POST'])
 @limiter.limit("2 per minute")
@@ -70,8 +86,8 @@ def forum_add_post():
         'title': p.title,
         'body': p.body,
         'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-        'reactions': _reaction_counts_for_post(p.id),
-        'comments': _comments_for_post(p.id),
+        'reactions': reaction_counts_for_post(p.id),
+        'comments': comments_for_post(p.id),
     }
     send_to_all_except(p.author_id, "forum_post", response)
     return jsonify(response), 201
@@ -134,6 +150,6 @@ def forum_toggle_reaction():
         db.session.add(PostReaction(post_id=p.id, user_id=uid, emoji=emoji))
     db.session.commit()
 
-    response = _reaction_counts_for_post(p.id)
+    response = reaction_counts_for_post(p.id)
     send_to_all_except(uid, "forum_reactions", {'post_id': p.id, 'reactions': response})
     return jsonify(response), 200

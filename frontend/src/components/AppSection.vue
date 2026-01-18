@@ -8,6 +8,36 @@ import Settings from './settings/Settings.vue';
 const props = defineProps(["username", "background"]);
 const emit = defineEmits(["updateIsLogged", "updateUsername", "updateBackground"]);
 const active_tab = ref("public");
+const forum_notifs = ref(0);
+const public_notifs = ref(0);
+const private_notifs = ref(0);
+
+function activatePublicChat() {
+    active_tab.value = "public";
+    public_notifs.value = 0;
+}
+
+function activatePrivateChat() {
+    active_tab.value = "private";
+    private_notifs.value = 0;
+}
+
+function activateForum() {
+    active_tab.value = "forum";
+    forum_notifs.value = 0;
+}
+
+function publicNotif() {
+    public_notifs.value++;
+}
+
+function privateNotif() {
+    private_notifs.value++;
+}
+
+function forumNotif() {
+    forum_notifs.value++;
+}
 
 function updateUsername(val: string) {
     emit("updateUsername", val);
@@ -27,23 +57,27 @@ function updateBackground(val: string) {
 
         <nav class="tabs">
             <button class="tab" :class="{ active: active_tab === 'public' }" data-tab="public"
-                @click="active_tab = 'public'">Publiczny czat</button>
+                @click="activatePublicChat">Publiczny czat<span v-if="public_notifs > 0" class="notif">{{ public_notifs
+                    }}</span></button>
             <button class="tab" :class="{ active: active_tab === 'private' }" data-tab="private"
-                @click="active_tab = 'private'">Prywatne</button>
+                @click="activatePrivateChat">Prywatne<span v-if="private_notifs > 0" class="notif">{{ private_notifs
+                    }}</span></button>
             <button class="tab" :class="{ active: active_tab === 'forum' }" data-tab="forum"
-                @click="active_tab = 'forum'">Forum</button>
+                @click="activateForum">Forum<span v-if="forum_notifs > 0" class="notif">{{ forum_notifs
+                    }}</span></button>
             <button class="tab last-button" :class="{ active: active_tab === 'settings' }" data-tab="settings"
                 @click="active_tab = 'settings'">Ustawienia</button>
         </nav>
 
-        <PublicChat v-if="active_tab == 'public'" />
+        <PublicChat v-if="active_tab == 'public'" :username="props.username" @privateNotif="privateNotif" @forumNotif="forumNotif" />
 
-        <PrivateChat v-else-if="active_tab == 'private'" :username="props.username" />
+        <PrivateChat v-else-if="active_tab == 'private'" :username="props.username" @publicNotif="publicNotif"
+            @forumNotif="forumNotif" />
 
         <Forum v-else-if="active_tab == 'forum'" />
 
         <Settings v-else :username="props.username" :background="props.background" @updateUsername="updateUsername"
-            @updateBackground="updateBackground" />
+            @updateBackground="updateBackground" @publicNotif="publicNotif" @privateNotif="privateNotif" />
 
     </section>
 </template>
@@ -63,5 +97,19 @@ function updateBackground(val: string) {
 
 .welcome {
     font-weight: 800;
+}
+
+.notif {
+    background-color: crimson;
+    color: white;
+    padding: 5px;
+    border-radius: 100%;
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%) translateX(20%);
 }
 </style>
