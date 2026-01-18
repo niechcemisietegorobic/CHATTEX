@@ -51,8 +51,14 @@ def check_environment():
         os.environ.get("REGION") 
     ) is not None
 
+# def media_bucket_url(filename):
+#     return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/{filename}"
+
+# def default_background_url():
+#     return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/backgrounds/default.png"
+
 def media_bucket_url(filename):
-    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/{filename}"
+    return f"{ os.environ.get("MEDIA_URL") }/{filename}"
 
 def default_background_url():
-    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/backgrounds/default.png"
+    return f"{ os.environ.get("MEDIA_URL") }/backgrounds/default.png"

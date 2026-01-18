@@ -25,7 +25,7 @@ async function removeMessage() {
         <span class="muted">{{ `${props.message.timestamp} ` }}</span>
         <span>{{ `${isPrivate ? props.message.from : props.message.username}: ${props.message.content}` }}</span>
         <button v-show="hovered && props.username == (isPrivate ? props.message.from : props.message.username)"
-            @click="removeMessage">Usuń wiadomość</button>
+            @click="removeMessage">Usuń</button>
     </div>
 </template>
 
@@ -43,7 +43,6 @@ async function removeMessage() {
 }
 
 button {
-    background-color: crimson;
     padding: 0px 5px 0px 5px;
     margin-left: auto;
 }
