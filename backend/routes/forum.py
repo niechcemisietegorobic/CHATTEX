@@ -1,7 +1,7 @@
 from models import PostReaction, ForumComment, ForumPost, User, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id
-from websock import socket, send_to_all_except
+from helpers import auth_user_id, limiter
+from websock import send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
@@ -27,6 +27,7 @@ def _comments_for_post(post_id: int):
     return out
 
 @forum_blueprint.route('/api/forum/posts', methods=['GET'])
+@limiter.limit("12 per minute")
 def forum_get_posts():
     posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).limit(10).all()
     out = []
@@ -44,6 +45,7 @@ def forum_get_posts():
     return jsonify(out), 200
 
 @forum_blueprint.route('/api/forum/posts', methods=['POST'])
+@limiter.limit("2 per minute")
 def forum_add_post():
     #dodawanie wlasnego posta
     uid = auth_user_id()
@@ -73,6 +75,7 @@ def forum_add_post():
     return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
+@limiter.limit("10 per minute")
 def forum_add_comment():
     # komentarze
     uid = auth_user_id()
@@ -103,6 +106,7 @@ def forum_add_comment():
     return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/reactions', methods=['POST'])
+@limiter.limit("10 per 10 seconds")
 def forum_toggle_reaction():
     # emoji
     uid = auth_user_id()

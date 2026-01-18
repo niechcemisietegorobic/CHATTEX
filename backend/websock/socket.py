@@ -2,9 +2,9 @@ from flask_socketio import SocketIO
 from flask import request
 from helpers import socket_auth_user_id
 from .cache import cache, get_all_key_values
+import os
 
-socket = SocketIO(cors_allowed_origins=["https://dev.chattex.cyanjnpr.dev", "https://chattex.cyanjnpr.dev"])
-
+socket = SocketIO(cors_allowed_origins=[os.environ.get("FRONTEND_URL")])
 
 def send_to_all_except(user_id: int, event: str, data):
     keyvals = get_all_key_values()

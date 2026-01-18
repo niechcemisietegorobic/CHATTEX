@@ -15,7 +15,7 @@ import AppFooter from './components/AppFooter.vue';
 
 <style scoped>
 .app-shell {
-  max-width: 920px;
+  max-width: max(90%, 920px);
   margin: 0 auto;
   padding: 28px 16px 18px;
 }

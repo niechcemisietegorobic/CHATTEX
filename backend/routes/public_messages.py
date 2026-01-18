@@ -1,11 +1,12 @@
 from models import PublicMessage, User, db
 from flask import request, jsonify, Blueprint
-from helpers import auth_user_id
-from websock import socket, send_to_all_except
+from helpers import auth_user_id, limiter
+from websock import send_to_all_except
 
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
 @public_messages_blueprint.route('/api/public/messages', methods=['GET'])
+@limiter.limit("12 per minute")
 def public_get():
     uid = auth_user_id()
     if not uid:
@@ -25,6 +26,7 @@ def public_get():
     return jsonify(out), 200
 
 @public_messages_blueprint.route('/api/public/messages', methods=['POST'])
+@limiter.limit("10 per 10 seconds")
 def public_post():
     # Dodaje wiadomość do publicznego czatu
     uid = auth_user_id()

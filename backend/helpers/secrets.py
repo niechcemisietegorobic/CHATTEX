@@ -9,7 +9,7 @@ def get_django_secret_key():
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name="us-east-1"
+        region_name=os.environ.get("REGION")
     )
     try:
         secret_value_response = client.get_secret_value(SecretId=secret_name)
@@ -24,7 +24,7 @@ def get_root_invite():
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name="us-east-1"
+        region_name=os.environ.get("REGION")
     )
     try:
         secret_value_response = client.get_secret_value(SecretId=secret_name)
@@ -38,7 +38,7 @@ def get_rds_credentials():
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name="us-east-1"
+        region_name=os.environ.get("REGION")
     )
     try:
         secret_value_response = client.get_secret_value(SecretId=secret_name)

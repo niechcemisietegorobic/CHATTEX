@@ -38,3 +38,20 @@ def is_dev():
 def random_invite_code():
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choices(chars, k=8))
+
+def check_environment():
+    return (
+        os.environ.get("IS_DEV") and
+        os.environ.get("RDS_URL") and
+        os.environ.get("CACHE_URL") and
+        os.environ.get("RDS_SECRET") and
+        os.environ.get("FRONTEND_URL") and
+        os.environ.get("MEDIA_BUCKET") and
+        os.environ.get("REGION") 
+    ) is not None
+
+def media_bucket_url(filename):
+    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/{filename}"
+
+def default_background_url():
+    return f"https://{ os.environ.get("MEDIA_BUCKET") }.s3.{ os.environ.get("REGION") }.amazonaws.com/backgrounds/default.png"

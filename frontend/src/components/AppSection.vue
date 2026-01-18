@@ -5,12 +5,16 @@ import Forum from './forum/Forum.vue';
 import { ref } from 'vue';
 import Settings from './settings/Settings.vue';
 
-const props = defineProps(["username"]);
-const emit = defineEmits(["updateIsLogged", "updateUsername"]);
+const props = defineProps(["username", "background"]);
+const emit = defineEmits(["updateIsLogged", "updateUsername", "updateBackground"]);
 const active_tab = ref("public");
 
 function updateUsername(val: string) {
     emit("updateUsername", val);
+}
+
+function updateBackground(val: string) {
+    emit("updateBackground", val);
 }
 </script>
 
@@ -38,7 +42,8 @@ function updateUsername(val: string) {
 
         <Forum v-else-if="active_tab == 'forum'" />
 
-        <Settings v-else :username="props.username" @updateUsername="updateUsername" />
+        <Settings v-else :username="props.username" :background="props.background" @updateUsername="updateUsername"
+            @updateBackground="updateBackground" />
 
     </section>
 </template>

@@ -7,9 +7,14 @@
 
 <style scoped>
 .topbar {
-  color: #e5e7eb;
-  margin-bottom: 16px;
-  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9);
+  margin-bottom: 14px;
+  /* color: #e5e7eb;
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9); */
+  background: rgba(255,255,255,0.72);
+  border-radius: 14px;
+  padding: 9px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
 }
 
 .brand{
