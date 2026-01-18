@@ -36,6 +36,8 @@ def public_post():
     content = (data.get('content') or '').strip()
     if not content:
         return jsonify({'error': 'Brak treści'}), 400
+    elif len(content) > 1024:
+        return jsonify({'error': 'Wiadomość jest zbyt długa'}), 400
     msg = PublicMessage(user_id=uid, content=content)
     db.session.add(msg)
     db.session.commit()

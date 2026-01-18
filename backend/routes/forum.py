@@ -57,6 +57,8 @@ def forum_add_post():
     body = (data.get('body') or '').strip()
     if not title or not body:
         return jsonify({'error': 'Wymagane: title, body'}), 400
+    elif len(title) > 120 or len(body) > 2048:
+        return jsonify({'error': 'Tytuł lub treść posta jest zbyt długa'}), 400
 
     p = ForumPost(author_id=uid, title=title, body=body)
     db.session.add(p)
@@ -87,6 +89,8 @@ def forum_add_comment():
     body = (data.get('body') or '').strip()
     if not post_id or not body:
         return jsonify({'error': 'Wymagane: post_id, body'}), 400
+    elif len(body) > 512:
+        return jsonify({'error': 'Komentarz jest zbyt długi'}), 400
 
     p = ForumPost.query.get(post_id)
     if not p:

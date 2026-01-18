@@ -29,6 +29,8 @@ def change_background():
             return jsonify({"error": "Przesłany obraz jest niskiej jakości"}), 400
         elif (width > 8192 or height > 8192):
             return jsonify({"error": "Przesłany obraz jest za duży"}), 400
+        elif (max(width, height) / min(width, height)) > 5:
+            return jsonify({"error": "Proporcje obrazu są nieodpowiednie"}), 400
     except:
         return jsonify({"error": "Przesłany plik nie jest obrazem"}), 400
     file.stream.seek(0)
@@ -50,8 +52,12 @@ def change_background():
         client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
     except ClientError as e:
         return jsonify({"error": "Zmiana tła nieudana"}), 400
-    bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
-    db.session.add(bg)
+    bg = Background.query.filter_by(user_id=uid).first()
+    if not bg:
+        bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
+        db.session.add(bg)
+    else:
+        bg.url = media_bucket_url(s3_filename)
     db.session.commit()
     return jsonify({"url": media_bucket_url(s3_filename)}), 200
 
@@ -85,6 +91,8 @@ def change_username():
     username = (data.get('username') or '').strip()
     if not username:
         return jsonify({'error': 'Brak danych logowania'}), 400
+    elif len(username) > 80:
+        return jsonify({'error': 'Nazwa użytkownika jest zbyt dluga'}), 400
 
     user = User.query.filter_by(username=username).first()
     if user:
