@@ -4,7 +4,7 @@ from helpers import auth_user_id, random_invite_code, limiter, default_backgroun
 import boto3
 from botocore.exceptions import ClientError
 import hashlib
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 import os
 
 settings_blueprint = Blueprint("settings_blueprint", __name__)
@@ -25,8 +25,10 @@ def change_background():
         img = Image.open(file.stream)
         img.verify()
         width, height = img.size
-        if (width < 1024 or height < 512):
+        if (width < 512 or height < 512):
             return jsonify({"error": "Przesłany obraz jest niskiej jakości"}), 400
+        elif (width > 8192 or height > 8192):
+            return jsonify({"error": "Przesłany obraz jest za duży"}), 400
     except:
         return jsonify({"error": "Przesłany plik nie jest obrazem"}), 400
     file.stream.seek(0)
