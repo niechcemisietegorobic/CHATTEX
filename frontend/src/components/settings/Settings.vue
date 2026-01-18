@@ -2,14 +2,13 @@
 import { API_URL, tokenHeader } from '@/constants';
 import { ref, type Ref } from 'vue';
 
-const props = defineProps(["username"]);
-const emit = defineEmits(["updateUsername"]);
+const props = defineProps(["username", "background"]);
+const emit = defineEmits(["updateUsername", "updateBackground"]);
 
 const backgroundInput: Ref<any> = ref(null);
 const is_changing_username = ref(false);
 const changed_username = ref(props.username);
 const invite_code = ref('');
-const bg = ref('');
 
 function openBackgroundInput() {
     backgroundInput.value.click();
@@ -31,21 +30,7 @@ async function change_background(event: any) {
         alert(data.error || 'Zmiana tła aplikacji zakończona niepowodzeniem.');
         return;
     }
-    bg.value = data.url;
-    document.body.style.backgroundImage = `url("${data.url}")`;
-}
-
-async function fetch_background() {
-    const r = await fetch(`${API_URL}/api/user/background`, {
-        headers: tokenHeader()
-    });
-    const data = await r.json();
-    if (r.status !== 200) {
-        alert(data.error || 'Nie udało się uzyskać adresu tła.');
-        return;
-    }
-
-    bg.value = data.url;
+    emit("updateBackground", data.url);
 }
 
 async function change_username() {
@@ -92,7 +77,6 @@ async function refresh_invite_code() {
 }
 
 fetch_invite_code();
-fetch_background();
 </script>
 
 <template>
@@ -116,8 +100,8 @@ fetch_background();
 
             <div class="row setting">
                 <span>Tło aplikacji: </span>
-                <div v-if="bg.length > 0" class="img-container">
-                    <img :src="bg" />
+                <div v-if="props.background.length > 0" class="img-container">
+                    <img :src="props.background" />
                     <button class="img-button" @click="openBackgroundInput">Zmień</button>
                 </div>
                 <input class="file-input" type="file" ref="backgroundInput" @change="change_background" />

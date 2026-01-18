@@ -2,7 +2,7 @@
 import AuthSection from './AuthSection.vue';
 import AppSection from './AppSection.vue';
 import { ref } from 'vue';
-import { API_URL } from '@/constants';
+import { API_URL, tokenHeader } from '@/constants';
 
 const is_logged = ref(false);
 const background = ref('');
@@ -12,7 +12,7 @@ function updateUsername(val: string) {
     username.value = val;
 }
 
-function updatedBackground(val: string) {
+function updateBackground(val: string) {
     background.value = val;
     document.body.style.backgroundImage = `url("${val}")`;
 }
@@ -31,7 +31,20 @@ async function fetchDefaultBackground() {
         alert(data.error || 'Nie udało się uzyskać adresu tła.');
         return;
     }
-    updatedBackground(data.url);
+    updateBackground(data.url);
+}
+
+async function fetch_background() {
+    const r = await fetch(`${API_URL}/api/user/background`, {
+        headers: tokenHeader()
+    });
+    const data = await r.json();
+    if (r.status !== 200) {
+        alert(data.error || 'Nie udało się uzyskać adresu tła.');
+        return;
+    }
+
+    updateBackground(data.url);
 }
 
 fetchDefaultBackground();
@@ -40,10 +53,11 @@ fetchDefaultBackground();
 <template>
     <main class="card">
 
-        <AuthSection v-if="!is_logged" @updateIsLogged="updateIsLogged" @updateUsername="updateUsername" 
+        <AuthSection v-if="!is_logged" @updateIsLogged="updateIsLogged" @updateUsername="updateUsername"
             :is_logged="is_logged" :username="username" />
 
-        <AppSection v-else :username="username" @updateUsername="updateUsername" @updateIsLogged="updateIsLogged" />
+        <AppSection v-else :username="username" :background="background" @updateUsername="updateUsername"
+            @updateBackground="updateBackground" @updateIsLogged="updateIsLogged" />
 
     </main>
 </template>

@@ -16,16 +16,16 @@ def change_background():
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     if 'file' not in request.files:
-        return jsonify({"error": "Zmiana tła nieudana"}), 400
+        return jsonify({"error": "Zmiana tła nieudana (brak file in request.files)"}), 400
     file = request.files['file']
     if (file.filename.find('.') == -1):
-        return jsonify({"error": "Zmiana tła nieudana"}), 400
+        return jsonify({"error": "Zmiana tła nieudana (brak extension: filename )" + file.filename}), 400
 
     try:
         img = Image.open(file.stream)
         img.verify()
-    except (UnidentifiedImageError, OSError):
-        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    except (UnidentifiedImageError, OSError) as e:
+        return jsonify({"error": "Zmiana tła nieudana (niepoprawny obraz)" + str(e)}), 400
     file.stream.seek(0)
     
     sha256 = hashlib.sha256()
@@ -50,14 +50,16 @@ def change_background():
     db.session.commit()
     return jsonify({"url": bg.url}), 200
 
+
 @settings_blueprint.route('/api/background', methods=['GET'])
 @limiter.limit("10 per 10 seconds")
-def get_background():
+def get_default_background():
     return jsonify({'url': default_background_url()}), 200
+
 
 @settings_blueprint.route('/api/user/background', methods=['GET'])
 @limiter.limit("10 per 10 seconds")
-def get_default_background():
+def get_background():
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
