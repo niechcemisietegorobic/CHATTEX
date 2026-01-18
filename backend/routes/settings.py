@@ -57,7 +57,7 @@ def get_background():
 
 @settings_blueprint.route('/api/user/background', methods=['GET'])
 @limiter.limit("10 per 10 seconds")
-def get_background():
+def get_default_background():
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401

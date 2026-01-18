@@ -5,30 +5,36 @@ import { ref } from 'vue';
 import { API_URL } from '@/constants';
 
 const is_logged = ref(false);
+const background = ref('');
 const username = ref('');
 
 function updateUsername(val: string) {
     username.value = val;
 }
 
+function updatedBackground(val: string) {
+    background.value = val;
+    document.body.style.backgroundImage = `url("${val}")`;
+}
+
 function updateIsLogged(val: boolean) {
     is_logged.value = val;
     if (!val) {
-        updateBackground();
+        fetchDefaultBackground();
     }
 }
 
-async function updateBackground() {
+async function fetchDefaultBackground() {
     const r = await fetch(`${API_URL}/api/background`);
     const data = await r.json();
     if (r.status !== 200) {
         alert(data.error || 'Nie udało się uzyskać adresu tła.');
         return;
     }
-    document.body.style.backgroundImage = `url("${data.url}")`;
+    updatedBackground(data.url);
 }
 
-updateBackground();
+fetchDefaultBackground();
 </script>
 
 <template>
