@@ -21,6 +21,8 @@ function updateIsLogged(val: boolean) {
     is_logged.value = val;
     if (!val) {
         fetchDefaultBackground();
+    } else {
+        fetchBackground();
     }
 }
 
@@ -34,7 +36,7 @@ async function fetchDefaultBackground() {
     updateBackground(data.url);
 }
 
-async function fetch_background() {
+async function fetchBackground() {
     const r = await fetch(`${API_URL}/api/user/background`, {
         headers: tokenHeader()
     });

@@ -12,20 +12,23 @@ settings_blueprint = Blueprint("settings_blueprint", __name__)
 @settings_blueprint.route('/api/user/background', methods=['POST'])
 @limiter.limit("6 per hour")
 def change_background():
-    # uid = auth_user_id()
-    # if not uid:
-    #     return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     if 'file' not in request.files:
-        return jsonify({"error": "Zmiana tła nieudana (brak file in request.files)"}), 400
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
     file = request.files['file']
     if (file.filename.find('.') == -1):
-        return jsonify({"error": "Zmiana tła nieudana (brak extension: filename )" + file.filename}), 400
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
 
     try:
         img = Image.open(file.stream)
         img.verify()
-    except (UnidentifiedImageError, OSError) as e:
-        return jsonify({"error": "Zmiana tła nieudana (niepoprawny obraz)" + str(e)}), 400
+        width, height = img.size
+        if (width < 1024 or height < 512):
+            return jsonify({"error": "Przesłany obraz jest niskiej jakości"}), 400
+    except:
+        return jsonify({"error": "Przesłany plik nie jest obrazem"}), 400
     file.stream.seek(0)
     
     sha256 = hashlib.sha256()
@@ -44,10 +47,10 @@ def change_background():
     try:
         client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
     except ClientError as e:
-        return jsonify({"error": str(e)}), 400#"Zmiana tła nieudana"}), 400
-    # bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
-    # db.session.add(bg)
-    # db.session.commit()
+        return jsonify({"error": "Zmiana tła nieudana"}), 400
+    bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
+    db.session.add(bg)
+    db.session.commit()
     return jsonify({"url": media_bucket_url(s3_filename)}), 200
 
 

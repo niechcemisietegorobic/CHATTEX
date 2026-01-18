@@ -21,10 +21,11 @@ async function change_background(event: any) {
     const formData = new FormData();
     formData.append('file', file);
     let headers = tokenHeader();
-    headers["Content-Type"] = "multipart/form-data";
     const r = await fetch(`${API_URL}/api/user/background`, {
         method: 'POST',
-        // headers: headers,
+        headers: {
+            "Authorization": headers.Authorization
+        },
         body: formData
     });
     const data = await r.json();
