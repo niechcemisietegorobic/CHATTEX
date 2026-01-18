@@ -12,9 +12,9 @@ settings_blueprint = Blueprint("settings_blueprint", __name__)
 @settings_blueprint.route('/api/user/background', methods=['POST'])
 @limiter.limit("6 per hour")
 def change_background():
-    uid = auth_user_id()
-    if not uid:
-        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    # uid = auth_user_id()
+    # if not uid:
+    #     return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     if 'file' not in request.files:
         return jsonify({"error": "Zmiana tła nieudana (brak file in request.files)"}), 400
     file = request.files['file']
@@ -45,10 +45,10 @@ def change_background():
         client.upload_fileobj(file, os.environ.get("MEDIA_BUCKET"), s3_filename)
     except ClientError as e:
         return jsonify({"error": str(e)}), 400#"Zmiana tła nieudana"}), 400
-    bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
-    db.session.add(bg)
-    db.session.commit()
-    return jsonify({"url": bg.url}), 200
+    # bg = Background(user_id=uid, url=media_bucket_url(s3_filename))
+    # db.session.add(bg)
+    # db.session.commit()
+    return jsonify({"url": media_bucket_url(s3_filename)}), 200
 
 
 @settings_blueprint.route('/api/background', methods=['GET'])
