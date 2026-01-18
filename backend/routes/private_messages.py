@@ -52,6 +52,8 @@ def private_post():
     content = (data.get('content') or '').strip()
     if not to_user or not content:
         return jsonify({'error': 'Wymagane: to, content'}), 400
+    elif len(content) > 1024:
+        return jsonify({'error': 'Wiadomość jest zbyt długa'}), 400
 
     other = user_by_username(to_user)
     if not other:

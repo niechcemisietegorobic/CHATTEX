@@ -25,7 +25,11 @@ def register():
     invite_code = data.get("invite_code")
     if not username or not password or not invite_code:
         return jsonify({'error': 'Brak danych rejestracyjnych'}), 400
-    if User.query.filter_by(username=username).first():
+    elif len(username) < 3 or len(password) < 8:
+        return jsonify({'error': 'Nazwa użytkownika lub hasło są zbyt krótkie'}), 400
+    elif len(username) > 80 or len(password) > 80:
+        return jsonify({'error': 'Nazwa użytkownika lub hasło są zbyt długie'}), 400
+    elif User.query.filter_by(username=username).first():
         return jsonify({'error': 'Użytkownik już istnieje'}), 400
     invite = Invite.query.filter_by(code=invite_code).first()
     # FIXME
@@ -49,6 +53,8 @@ def login():
     password = data.get('password')
     if not username or not password:
         return jsonify({'error': 'Brak danych logowania'}), 400
+    elif len(username) > 80 or len(password) > 80:
+        return jsonify({'error': 'Nazwa użytkownika lub hasło są zbyt długie'}), 400
 
     user = User.query.filter_by(username=username).first()
     if not user or not check_password_hash(user.password_hash, password):
