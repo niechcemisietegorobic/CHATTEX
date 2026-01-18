@@ -6,7 +6,7 @@ from websock import send_only_to
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
-@limiter.limit("12 per minute")
+@limiter.limit("24 per minute")
 def private_get():
     uid = auth_user_id()
     if not uid:
@@ -39,6 +39,22 @@ def private_get():
         })
     out.reverse()
     return jsonify(out), 200
+
+
+@private_messages_blueprint.route('/api/private/messages/<int:mid>', methods=['DELETE'])
+@limiter.limit("6 per minute")
+def private_delete(mid: int):
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    msg = PrivateMessage.query.filter_by(id=mid).first()
+    if (msg.sender_id != uid):
+        return jsonify({'error': 'Brak uprawnień'}), 400
+    db.session.delete(msg)
+    db.session.commit()
+    send_only_to(msg.receiver_id, "private_message_delete", {'id': mid})
+    return jsonify({'id': mid}), 200
+
 
 @private_messages_blueprint.route('/api/private/messages', methods=['POST'])
 @limiter.limit("10 per 10 seconds")

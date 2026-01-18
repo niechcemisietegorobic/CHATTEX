@@ -4,8 +4,10 @@ import { ref, type Ref, onUnmounted, nextTick } from 'vue';
 import ChatMessage from './ChatMessage.vue';
 import { io } from 'socket.io-client';
 
-const messages: Ref<any, any> = ref([])
-const typed_message = ref('')
+const props = defineProps(["username"]);
+const emit = defineEmits(["privateNotif", "forumNotif"]);
+const messages: Ref<Array<any>> = ref([]);
+const typed_message = ref('');
 const chat_box: Ref<any> = ref(null);
 
 const socket = io(SOCKET_URL, {
@@ -18,9 +20,29 @@ onUnmounted(() => {
   socket.close();
 });
 
+function removeMessage(id: number) {
+  messages.value = messages.value.filter(e => e.id != id);
+}
+
 socket.on("public_message", (msg) => {
   messages.value.push(msg);
   scrollChatBox();
+});
+
+socket.on("public_message_delete", (msg) => {
+  removeMessage(msg.id);
+});
+
+socket.on("private_message", () => {
+  emit("privateNotif");
+});
+
+socket.on("forum_post", () => {
+  emit("forumNotif");
+});
+
+socket.on("forum_comment", () => {
+  emit("forumNotif");
 });
 
 async function refreshPublic() {
@@ -65,7 +87,7 @@ refreshPublic();
     <div class="panel">
       <div class="panel-title">Publiczny czat</div>
       <div ref="chat_box" id="public-messages" class="box">
-        <ChatMessage v-for="message in messages" :isPrivate="false" :message />
+        <ChatMessage v-for="message in messages" :username="props.username" :isPrivate="false" :message @removeMessage="removeMessage" />
       </div>
       <form id="public-form" class="row">
         <input v-model="typed_message" type="text" id="public-input" placeholder="Napisz publicznie..." required />

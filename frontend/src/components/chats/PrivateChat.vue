@@ -5,10 +5,11 @@ import { io } from 'socket.io-client';
 import ChatMessage from './ChatMessage.vue';
 
 const props = defineProps(["username"]);
+const emit = defineEmits(["publicNotif", "forumNotif"]);
 
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
-const dm: Ref<any> = ref([]);
+const dm: Ref<Array<any>> = ref([]);
 const typed_message = ref('');
 const chat_box: Ref<any> = ref(null);
 
@@ -67,11 +68,31 @@ onUnmounted(() => {
     socket.close();
 });
 
+function removeMessage(id: number) {
+  dm.value = dm.value.filter(e => e.id != id);
+}
+
 socket.on("private_message", (msg) => {
     if (msg.from == selected_user.value) {
         dm.value.push(msg);
         scrollChatBox();
     }
+});
+
+socket.on("private_message_delete", (msg) => {
+    removeMessage(msg.id);
+});
+
+socket.on("public_message", () => {
+  emit("publicNotif");
+});
+
+socket.on("forum_post", () => {
+  emit("forumNotif");
+});
+
+socket.on("forum_comment", () => {
+  emit("forumNotif");
 });
 
 refreshUsers();
@@ -92,7 +113,7 @@ refreshUsers();
 
             <div ref="chat_box" id="dm-messages" class="box">
                 <div v-if="dm.length == 0">Brak wiadomości do wyświetlenia</div>
-                <ChatMessage v-else v-for="message in dm" :isPrivate="true" :message/>
+                <ChatMessage v-else v-for="message in dm" :username="props.username" :isPrivate="true" :message @removeMessage="removeMessage" />
             </div>
 
             <form id="dm-form" class="row">
