@@ -95,7 +95,6 @@ socket.on("public_message", () => {
   emit("publicNotif");
 });
 
-
 socket.on("private_message", () => {
   emit("privateNotif");
 });
