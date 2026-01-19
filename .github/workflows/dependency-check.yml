@@ -1,0 +1,53 @@
+name: Dependency Check
+
+on:
+  push:
+
+jobs:
+  dependency-check:
+    name: dependency_check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write 
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: build_with_npm
+        working-directory: frontend
+        run: npm ci
+
+      - name: depecheck_frontend
+        uses: dependency-check/Dependency-Check_Action@1.1.0
+        with:
+          project: "frontend"
+          path: "frontend"
+          format: "SARIF"
+          out: 'reports'
+          args: >
+            --enableExperimental
+            --failOnCVSS 7
+            
+      - name: build_with_pip
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: depecheck_backend
+        uses: dependency-check/Dependency-Check_Action@1.1.0
+        with:
+          project: "backend"
+          path: "backend"
+          format: "SARIF"
+          out: 'reports'
+          args: >
+            --enableExperimental
+            --failOnCVSS 7
+            
+      - name: upload_test_results
+        uses: actions/upload-artifact@master
+        with:
+           name: Depcheck report
+           path: ${{github.workspace}}/reports
