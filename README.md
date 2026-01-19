@@ -1,5 +1,6 @@
 # CHATTEX - CHATTUJ DO WOLI 💬
 
+[![CodeQL Advanced](https://github.com/niechcemisietegorobic/CHATTEX/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/niechcemisietegorobic/CHATTEX/actions/workflows/codeql.yml)
 ![Frontend Dev Build](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiQVR2cklYaGRwRkZVK1EyQ1NKQm1FdkgzY3lFOThLT0toRkpMQTZMa2taM0ppVHVJODZ3M243UlI5RE8yVkZkMFpMSDhFYUU1OXFDb1l1WGNSRmN1cEVJPSIsIml2UGFyYW1ldGVyU3BlYyI6Ikd5cWlQeE8xdHBMTGFkRUsiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 ![Frontend Prod Build](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZ1lCdzVqV3JJT1FhWld6K0I4QzYwdG84bUcxQ01GbVpFRjc4QTNzSmJrbUJoOHZ1Z0szV1pXVHZ6dVZCSVB5Zlk5aHY0R1lad09TbWFha0FUVGYxblpnPSIsIml2UGFyYW1ldGVyU3BlYyI6InhvUk1VOWFMZUpBaFZEMkQiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
