@@ -5,6 +5,18 @@ from websock import send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
+def wipe_post_reactios(post_id: int):
+    rows = PostReaction.query.filter_by(post_id=post_id).all()
+    for r in rows:
+        db.session.delete(r)
+    db.session.commit()
+
+def wipe_post_comments(post_id: int):
+    rows = ForumComment.query.filter_by(post_id=post_id).all()
+    for r in rows:
+        db.session.delete(r)
+    db.session.commit()
+
 def reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}
@@ -54,6 +66,8 @@ def forum_delete_post(pid: int):
     post = ForumPost.query.filter_by(id=pid).first()
     if (post.author_id != uid):
         return jsonify({'error': 'Brak uprawnień'}), 400
+    wipe_post_comments(pid)
+    wipe_post_reactios(pid)
     db.session.delete(post)
     db.session.commit()
     send_to_all_except(post.author_id, "forum_post_delete", {'id': pid})
@@ -91,6 +105,20 @@ def forum_add_post():
     }
     send_to_all_except(p.author_id, "forum_post", response)
     return jsonify(response), 201
+
+@forum_blueprint.route('/api/forum/comments/<int:pid>', methods=['DELETE'])
+@limiter.limit("3 per minute")
+def forum_delete_post(cid: int):
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    comment = ForumComment.query.filter_by(id=cid).first()
+    if (comment.author_id != uid):
+        return jsonify({'error': 'Brak uprawnień'}), 400
+    db.session.delete(comment)
+    db.session.commit()
+    send_to_all_except(comment.author_id, "forum_comment_delete", {'id': cid, 'post_id': comment.post_id})
+    return jsonify({'id': cid, 'post_id': comment.post_id}), 200
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
 @limiter.limit("10 per minute")

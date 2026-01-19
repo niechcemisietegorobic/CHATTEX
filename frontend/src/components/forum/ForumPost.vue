@@ -4,9 +4,10 @@ import ForumComment from './ForumComment.vue';
 import { ref } from 'vue';
 import { API_URL, tokenHeader } from '@/constants';
 
-const props = defineProps(["post"])
-const emit = defineEmits(["updateComment", "updateReactions"])
+const props = defineProps(["post", "username"]);
+const emit = defineEmits(["updateComment", "updateReactions", "removePost", "removeComment"]);
 const typed_comment = ref('');
+const hovered = ref(false);
 
 const REACTIONS = ["👍", "❤️", "😂", "😮", "😡"];
 
@@ -24,15 +25,33 @@ async function addComment() {
     }
 }
 
+async function removePost() {
+    const r = await fetch(`${API_URL}/api/forum/posts/${props.post.id}`, {
+        method: 'DELETE',
+        headers: tokenHeader(),
+    });
+    const data = await r.json();
+    if (r.status !== 200) alert(data.error || 'Błąd');
+    else {
+        emit("removePost", data.id);
+    }
+}
+
 function updateReactions(post_id: number, reactions: any) {
     emit("updateReactions", post_id, reactions);
+}
+
+function removeComment(post_id: number, comment_id: number) {
+    emit("removeComment", post_id, comment_id);
 }
 </script>
 
 <template>
-    <div class="post">
+    <div class="post" @mouseenter="hovered = true" @mouseleave="hovered = false">
         <div class="post-title">
             {{ props.post.title }}
+            <button class="removal-button" v-show="hovered && props.username == props.post.author"
+                @click="removePost">Usuń</button>
         </div>
         <div class="post-meta">
             {{ props.post.timestamp + " • " + props.post.author }}
@@ -49,7 +68,7 @@ function updateReactions(post_id: number, reactions: any) {
             Komentarze:
         </div>
         <div class="comments">
-            <ForumComment v-for="comment in props.post.comments" :comment />
+            <ForumComment v-for="comment in props.post.comments" :comment :username="props.username" @removeComment="removeComment" />
         </div>
         <form class="row">
             <input v-model="typed_comment" type="text" class="comment-input" placeholder="Dodaj komentarz..."
@@ -68,6 +87,7 @@ function updateReactions(post_id: number, reactions: any) {
 }
 
 .post-title {
+    display: flex;
     font-weight: 900;
     font-size: 16px;
 }
@@ -101,5 +121,11 @@ function updateReactions(post_id: number, reactions: any) {
     border-radius: 10px;
     padding: 8px;
     margin: 8px 0;
+}
+
+.removal-button {
+    padding: 0px 5px 0px 5px;
+    margin-left: auto;
+    font-weight: bold;
 }
 </style>

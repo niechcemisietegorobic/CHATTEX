@@ -45,5 +45,8 @@ async function removeMessage() {
 button {
     padding: 0px 5px 0px 5px;
     margin-left: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: bold;
 }
 </style>

@@ -74,7 +74,7 @@ function updateBackground(val: string) {
         <PrivateChat v-else-if="active_tab == 'private'" :username="props.username" @publicNotif="publicNotif"
             @forumNotif="forumNotif" />
 
-        <Forum v-else-if="active_tab == 'forum'" />
+        <Forum v-else-if="active_tab == 'forum'" :username="props.username" />
 
         <Settings v-else :username="props.username" :background="props.background" @updateUsername="updateUsername"
             @updateBackground="updateBackground" @publicNotif="publicNotif" @privateNotif="privateNotif" />

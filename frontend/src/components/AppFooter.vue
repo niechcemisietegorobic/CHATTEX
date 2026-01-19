@@ -4,7 +4,7 @@
 
 <template>
   <footer class="foot">
-    {{ `${IS_DEV ? "Development" : "Production"} build ${IS_DEV ? BUILD_NUMBER : "" } • Backend: flask • Frontend: vue.js` }}
+    {{ `Wersja ${IS_DEV ? "Testowa" : "Produkcyjna"} ${IS_DEV ? BUILD_NUMBER : "" } • Backend: flask • Frontend: vue.js` }}
   </footer>
 </template>
 
