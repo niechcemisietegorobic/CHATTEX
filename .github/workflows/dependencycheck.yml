@@ -25,7 +25,7 @@ jobs:
         with:
           project: "frontend"
           path: "frontend"
-          format: "HTML,SARIF"
+          format: "SARIF"
           out: 'reports'
           args: >
             --enableExperimental
@@ -40,18 +40,18 @@ jobs:
         with:
           project: "backend"
           path: "backend"
-          format: "HTML,SARIF"
+          format: "SARIF"
           out: 'reports'
           args: >
             --enableExperimental
             --failOnCVSS 7
             
-      - name: Upload frontend SARIF results
+      - name: upload_frontend_sarif_results
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: dependency-check-reports/one/dependency-check-report.sarif
+          sarif_file: dependency-check-reports/frontend/dependency-check-report.sarif
 
-      - name: Upload backend SARIF results
+      - name: upload_backend_sarif_results
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: dependency-check-reports/two/dependency-check-report.sarif
+          sarif_file: dependency-check-reports/backend/dependency-check-report.sarif
