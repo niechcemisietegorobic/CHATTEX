@@ -108,7 +108,7 @@ def forum_add_post():
 
 @forum_blueprint.route('/api/forum/comments/<int:pid>', methods=['DELETE'])
 @limiter.limit("3 per minute")
-def forum_delete_post(cid: int):
+def forum_delete_comment(cid: int):
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
