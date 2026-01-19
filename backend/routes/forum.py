@@ -106,7 +106,7 @@ def forum_add_post():
     send_to_all_except(p.author_id, "forum_post", response)
     return jsonify(response), 201
 
-@forum_blueprint.route('/api/forum/comments/<int:pid>', methods=['DELETE'])
+@forum_blueprint.route('/api/forum/comments/<int:cid>', methods=['DELETE'])
 @limiter.limit("3 per minute")
 def forum_delete_comment(cid: int):
     uid = auth_user_id()
