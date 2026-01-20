@@ -24,8 +24,9 @@ def reaction_counts_for_post(post_id: int):
         counts[r.emoji] = counts.get(r.emoji, 0) + 1
     return counts
 
-def comments_for_post(post_id: int):
-    rows = ForumComment.query.filter_by(post_id=post_id).order_by(ForumComment.timestamp.desc()).limit(10).all()
+def comments_for_post(post_id: int, skip: int = 0, limit: int = 1):
+    rows = ForumComment.query.filter_by(post_id=post_id).order_by(
+        ForumComment.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for c in rows:
         author = User.query.get(c.author_id)
@@ -41,7 +42,11 @@ def comments_for_post(post_id: int):
 @forum_blueprint.route('/api/forum/posts', methods=['GET'])
 @limiter.limit("12 per minute")
 def forum_get_posts():
-    posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).limit(10).all()
+    skip = request.args.get("skip", type=int) or 0
+    limit = max(request.args.get("limit", type=int) or 3, 10)
+    cskip = request.args.get("skip", type=int) or 0
+    climit = max(request.args.get("limit", type=int) or 5, 20)
+    posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for p in posts:
         author = User.query.get(p.author_id)
@@ -52,7 +57,7 @@ def forum_get_posts():
             'body': p.body,
             'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
             'reactions': reaction_counts_for_post(p.id),
-            'comments': comments_for_post(p.id),
+            'comments': comments_for_post(p.id, cskip, climit),
         })
     return jsonify(out), 200
 

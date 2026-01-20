@@ -8,6 +8,8 @@ private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
 @limiter.limit("24 per minute")
 def private_get():
+    skip = request.args.get("skip", type=int) or 0
+    limit = max(request.args.get("limit", type=int) or 30, 100)
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
@@ -25,7 +27,7 @@ def private_get():
             db.and_(PrivateMessage.sender_id == uid, PrivateMessage.receiver_id == other.id),
             db.and_(PrivateMessage.sender_id == other.id, PrivateMessage.receiver_id == uid)
         )
-    ).order_by(PrivateMessage.timestamp.desc()).limit(100).all()
+    ).order_by(PrivateMessage.timestamp.desc()).offset(skip).limit(limit).all()
 
     out = []
     for m in msgs:
@@ -89,9 +91,11 @@ def private_post():
     send_only_to(other.id, "private_message", response)
     return jsonify(response), 201
 
+
 @private_messages_blueprint.route('/api/users', methods=['GET'])
 @limiter.limit("12 per minute")
 def list_users():
-    # Lista użytkowników (do DM)
-    users = User.query.order_by(User.username.asc()).all()
+    skip = request.args.get("skip", type=int) or 0
+    limit = max(request.args.get("limit", type=int) or 20, 50)
+    users = User.query.order_by(User.username.asc()).offset(skip).limit(limit).all()
     return jsonify([u.username for u in users]), 200
