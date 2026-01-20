@@ -99,6 +99,7 @@ socket.on("forum_comment", () => {
 
 function selectUser(user: string) {
     selected_user.value = user;
+    dm.value = [];
     fetchDM();
 }
 
