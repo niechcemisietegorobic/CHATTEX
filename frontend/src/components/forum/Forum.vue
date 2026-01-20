@@ -5,7 +5,7 @@ import ForumPost from './ForumPost.vue';
 import { io } from 'socket.io-client';
 
 const props = defineProps(["username"]);
-const emit = defineEmits(["publicNotif", "privateNotif"]);
+const emit = defineEmits(["publicNotif", "privateNotif", "updateOnline"]);
 
 const posts: Ref<Array<any>> = ref([]);
 const typed_title = ref('');
@@ -108,6 +108,10 @@ socket.on("forum_post_delete", (post) => {
 
 socket.on("forum_comment_delete", (comment) => {
   removeComment(comment.post_id, comment.id);
+});
+
+socket.on("stats", () => {
+    emit("updateOnline");
 });
 
 refreshPosts();

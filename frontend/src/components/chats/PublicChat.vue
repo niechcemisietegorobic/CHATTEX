@@ -5,7 +5,7 @@ import ChatMessage from './ChatMessage.vue';
 import { io } from 'socket.io-client';
 
 const props = defineProps(["username"]);
-const emit = defineEmits(["privateNotif", "forumNotif"]);
+const emit = defineEmits(["privateNotif", "forumNotif", "updateOnline"]);
 const messages: Ref<Array<any>> = ref([]);
 const typed_message = ref('');
 const chat_box: Ref<any> = ref(null);
@@ -43,6 +43,10 @@ socket.on("forum_post", () => {
 
 socket.on("forum_comment", () => {
   emit("forumNotif");
+});
+
+socket.on("stats", () => {
+    emit("updateOnline");
 });
 
 async function fetchPublic(scroll: boolean = true, skip: number = 0, limit: number = 30) {

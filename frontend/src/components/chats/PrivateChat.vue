@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import ChatMessage from './ChatMessage.vue';
 
 const props = defineProps(["username"]);
-const emit = defineEmits(["publicNotif", "forumNotif"]);
+const emit = defineEmits(["publicNotif", "forumNotif", "updateOnline"]);
 
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
@@ -95,6 +95,10 @@ socket.on("forum_post", () => {
 
 socket.on("forum_comment", () => {
     emit("forumNotif");
+});
+
+socket.on("stats", () => {
+    emit("updateOnline");
 });
 
 function selectUser(user: string) {

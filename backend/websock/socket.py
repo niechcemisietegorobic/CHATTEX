@@ -10,6 +10,10 @@ socket = SocketIO(cors_allowed_origins=[os.environ.get("FRONTEND_URL")])
 def send_to_all_except(user_id: int, event: str, data):
     keyvals = get_all_key_values()
     [socket.emit(event, data, to=k) for k, v in keyvals.items() if v != str(user_id)]
+
+def send_to_all(event: str, data):
+    keyvals = get_all_key_values()
+    [socket.emit(event, data, to=k) for k, v in keyvals.items()]
     
 def send_only_to(user_id: int, event: str, data):
     keyvals = get_all_key_values()
@@ -21,7 +25,9 @@ def handle_connect(data):
         user_id = socket_auth_user_id(data["token"])
         if (user_id is not None):
             cache.set(request.sid, str(user_id), expiry=ExpirySet(ExpiryType.SEC, session_duration()))
+            send_to_all("stats", {})
 
 @socket.on("disconnect")
 def handle_disconnect():
     cache.delete([request.sid])
+    send_to_all("stats", {})
