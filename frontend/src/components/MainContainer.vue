@@ -4,6 +4,8 @@ import AppSection from './AppSection.vue';
 import { ref } from 'vue';
 import { API_URL, tokenHeader } from '@/constants';
 
+const emit = defineEmits(["updateOnline"]);
+
 const is_logged = ref(false);
 const background = ref('');
 const username = ref('');
@@ -24,6 +26,7 @@ function updateIsLogged(val: boolean) {
     } else {
         fetchBackground();
     }
+    updateOnline();
 }
 
 async function fetchDefaultBackground() {
@@ -49,6 +52,10 @@ async function fetchBackground() {
     updateBackground(data.url);
 }
 
+function updateOnline() {
+    emit("updateOnline");
+}
+
 fetchDefaultBackground();
 </script>
 
@@ -59,7 +66,7 @@ fetchDefaultBackground();
             :is_logged="is_logged" :username="username" />
 
         <AppSection v-else :username="username" :background="background" @updateUsername="updateUsername"
-            @updateBackground="updateBackground" @updateIsLogged="updateIsLogged" />
+            @updateBackground="updateBackground" @updateIsLogged="updateIsLogged" @updateOnline="updateOnline" />
 
     </main>
 </template>

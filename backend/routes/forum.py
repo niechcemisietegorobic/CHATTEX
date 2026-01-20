@@ -42,10 +42,13 @@ def comments_for_post(post_id: int, skip: int = 0, limit: int = 1):
 @forum_blueprint.route('/api/forum/posts', methods=['GET'])
 @limiter.limit("12 per minute")
 def forum_get_posts():
-    skip = request.args.get("skip", type=int) or 0
-    limit = max(request.args.get("limit", type=int) or 3, 10)
-    cskip = request.args.get("skip", type=int) or 0
-    climit = max(request.args.get("limit", type=int) or 5, 20)
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    skip = request.args.get("skip", default=0, type=int)
+    limit = min(request.args.get("limit", default=3, type=int), 10)
+    cskip = request.args.get("skip", default=0, type=int)
+    climit = min(request.args.get("limit", default=5, type=int), 20)
     posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for p in posts:

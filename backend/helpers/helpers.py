@@ -5,6 +5,9 @@ from models import User
 import random
 import string
 
+def session_duration() -> int:
+    return 60 * 60 * 8
+
 def auth_user_id():
     # Sprawdza token JWT i zwraca id użytkownika
     auth_header = request.headers.get('Authorization')

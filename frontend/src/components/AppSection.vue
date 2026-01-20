@@ -6,7 +6,7 @@ import { ref } from 'vue';
 import Settings from './settings/Settings.vue';
 
 const props = defineProps(["username", "background"]);
-const emit = defineEmits(["updateIsLogged", "updateUsername", "updateBackground"]);
+const emit = defineEmits(["updateIsLogged", "updateUsername", "updateBackground", "updateOnline"]);
 const active_tab = ref("public");
 const forum_notifs = ref(0);
 const public_notifs = ref(0);
@@ -14,16 +14,19 @@ const private_notifs = ref(0);
 
 function activatePublicChat() {
     active_tab.value = "public";
+    updateOnline();
     public_notifs.value = 0;
 }
 
 function activatePrivateChat() {
     active_tab.value = "private";
+    updateOnline();
     private_notifs.value = 0;
 }
 
 function activateForum() {
     active_tab.value = "forum";
+    updateOnline();
     forum_notifs.value = 0;
 }
 
@@ -46,6 +49,10 @@ function updateUsername(val: string) {
 function updateBackground(val: string) {
     emit("updateBackground", val);
 }
+
+function updateOnline() {
+    emit("updateOnline");
+}
 </script>
 
 <template>
@@ -58,23 +65,25 @@ function updateBackground(val: string) {
         <nav class="tabs">
             <button class="tab" :class="{ active: active_tab === 'public' }" data-tab="public"
                 @click="activatePublicChat">Publiczny czat<span v-if="public_notifs > 0" class="notif">{{ public_notifs
-                    }}</span></button>
+                }}</span></button>
             <button class="tab" :class="{ active: active_tab === 'private' }" data-tab="private"
                 @click="activatePrivateChat">Prywatne<span v-if="private_notifs > 0" class="notif">{{ private_notifs
-                    }}</span></button>
+                }}</span></button>
             <button class="tab" :class="{ active: active_tab === 'forum' }" data-tab="forum"
                 @click="activateForum">Forum<span v-if="forum_notifs > 0" class="notif">{{ forum_notifs
-                    }}</span></button>
+                }}</span></button>
             <button class="tab last-button" :class="{ active: active_tab === 'settings' }" data-tab="settings"
                 @click="active_tab = 'settings'">Ustawienia</button>
         </nav>
 
-        <PublicChat v-if="active_tab == 'public'" :username="props.username" @privateNotif="privateNotif" @forumNotif="forumNotif" />
+        <PublicChat v-if="active_tab == 'public'" :username="props.username" @privateNotif="privateNotif"
+            @forumNotif="forumNotif" @updateOnline="updateOnline" />
 
         <PrivateChat v-else-if="active_tab == 'private'" :username="props.username" @publicNotif="publicNotif"
-            @forumNotif="forumNotif" />
+            @forumNotif="forumNotif" @updateOnline="updateOnline" />
 
-        <Forum v-else-if="active_tab == 'forum'" :username="props.username" @publicNotif="publicNotif" @privateNotif="privateNotif" />
+        <Forum v-else-if="active_tab == 'forum'" :username="props.username" @publicNotif="publicNotif"
+            @privateNotif="privateNotif" @updateOnline="updateOnline" />
 
         <Settings v-else :username="props.username" :background="props.background" @updateUsername="updateUsername"
             @updateBackground="updateBackground" />

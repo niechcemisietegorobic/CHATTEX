@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import ChatMessage from './ChatMessage.vue';
 
 const props = defineProps(["username"]);
-const emit = defineEmits(["publicNotif", "forumNotif"]);
+const emit = defineEmits(["publicNotif", "forumNotif", "updateOnline"]);
 
 const users: Ref<any> = ref([]);
 const selected_user = ref('');
@@ -13,18 +13,18 @@ const dm: Ref<Array<any>> = ref([]);
 const typed_message = ref('');
 const chat_box: Ref<any> = ref(null);
 
-async function refreshDM() {
-    dm.value = [];
-    const r = await fetch(`${API_URL}/api/private/messages?with=${selected_user.value}`, {
+async function fetchDM(scroll: boolean = true, skip: number = 0, limit: number = 30) {
+    const r = await fetch(`${API_URL}/api/private/messages?with=${selected_user.value}&skip=${skip}&limit=${limit}`, {
+        method: 'GET',
         headers: tokenHeader()
     });
-    const data = await r.json();
+    const list = await r.json();
 
     if (r.status !== 200) {
         return;
     }
-    dm.value = data;
-    scrollChatBox();
+    dm.value = list.concat(dm.value);
+    if (scroll) scrollChatBox();
 }
 
 async function sendDM() {
@@ -42,12 +42,14 @@ async function sendDM() {
     }
 }
 
-async function refreshUsers() {
-    const r = await fetch(`${API_URL}/api/users`);
+async function fetchUsers(skip: number = 0, limit: number = 10) {
+    const r = await fetch(`${API_URL}/api/users?skip=${skip}&limit=${limit}`, {
+        method: 'GET',
+        headers: tokenHeader(),
+    });
     const list: any[] = await r.json();
 
-    //w dm pokazuje kazdego opocz mnie
-    users.value = list.filter(u => u !== props.username);
+    users.value = users.value.concat(list);//.filter(u => u !== props.username));
 }
 
 function scrollChatBox() {
@@ -69,7 +71,7 @@ onUnmounted(() => {
 });
 
 function removeMessage(id: number) {
-  dm.value = dm.value.filter(e => e.id != id);
+    dm.value = dm.value.filter(e => e.id != id);
 }
 
 socket.on("private_message", (msg) => {
@@ -84,18 +86,28 @@ socket.on("private_message_delete", (msg) => {
 });
 
 socket.on("public_message", () => {
-  emit("publicNotif");
+    emit("publicNotif");
 });
 
 socket.on("forum_post", () => {
-  emit("forumNotif");
+    emit("forumNotif");
 });
 
 socket.on("forum_comment", () => {
-  emit("forumNotif");
+    emit("forumNotif");
 });
 
-refreshUsers();
+socket.on("stats", () => {
+    emit("updateOnline");
+});
+
+function selectUser(user: string) {
+    selected_user.value = user;
+    dm.value = [];
+    fetchDM();
+}
+
+fetchUsers();
 </script>
 
 <template>
@@ -104,29 +116,82 @@ refreshUsers();
         <div class="panel">
             <div class="panel-title">Prywatne wiadomości</div>
 
-            <div class="row">
-                <select v-model="selected_user" id="dm-user" @change="refreshDM">
-                    <option v-for="(user, index) in users" :key="index" :value="user">{{ user }}</option>
-                </select>
-                <button id="dm-refresh" type="button" class="ghost" @click="refreshUsers">Odśwież</button>
-            </div>
+            <div class="column">
+                <div class="users-box">
+                    <div class="panel-title">Lista użytkowników</div>
+                    <div class="users-list">
+                        <button v-for="(user) in users" :key="user" class="ghost expand"
+                            :class="{ active: user == selected_user }" @click="selectUser(user)">{{
+                                user }}</button>
+                        <button id="dm-refresh" type="button" class="expand"
+                            @click="fetchUsers(users.length)">Więcej</button>
+                    </div>
+                </div>
 
-            <div ref="chat_box" id="dm-messages" class="box">
-                <div v-if="dm.length == 0">Brak wiadomości do wyświetlenia</div>
-                <ChatMessage v-else v-for="message in dm" :username="props.username" :isPrivate="true" :message @removeMessage="removeMessage" />
-            </div>
+                <div class="dm-box">
+                    <div ref="chat_box" class="box">
+                        <div v-if="dm.length == 0">Brak wiadomości do wyświetlenia</div>
+                        <div v-else>
+                            <button class="ghost more-button" @click="fetchDM(false, dm.length)">Wczytaj
+                                poprzednie</button>
+                            <ChatMessage v-for="message in dm" :username="props.username"
+                                :isPrivate="true" :message @removeMessage="removeMessage" />
+                        </div>
+                    </div>
 
-            <form id="dm-form" class="row">
-                <input v-model="typed_message" type="text" id="dm-input" placeholder="Napisz prywatnie..." required />
-                <button type="submit" @click.prevent="sendDM">Wyślij</button>
-            </form>
+                    <form id="dm-form" class="row">
+                        <input v-model="typed_message" type="text" id="dm-input" placeholder="Napisz prywatnie..."
+                            required />
+                        <button type="submit" @click.prevent="sendDM">Wyślij</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </section>
 </template>
 
 <style scoped>
-.panel-title{
-  font-weight: 800;
-  margin-bottom: 8px;
+.panel-title {
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.column {
+    display: flex;
+    flex-flow: row;
+    gap: 10px;
+}
+
+.dm-box {
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+.users-box {
+    padding: 5px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.users-list {
+    margin: 10px 0;
+    overflow-y: scroll;
+    min-height: 0;
+    height: max(260px, 40vh);
+}
+
+.expand {
+    width: 100%;
+}
+
+.ghost.active {
+    background: linear-gradient(90deg, rgb(138, 138, 138) 1%, rgba(190, 190, 190, 0) 40%);
+    border: 2px solid black;
+}
+
+.more-button {
+    padding: 4px;
+    border-radius: 4px;
+    font-weight: 500;
 }
 </style>

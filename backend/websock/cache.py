@@ -26,3 +26,15 @@ def get_all_key_values():
         value = cache.get(key)
         result[key.decode()] = value.decode() if value else None
     return result
+
+def get_dbsize() -> int:
+    return cache.dbsize()
+
+def get_online_number() -> int:
+    keys = get_all_keys()
+    result = []
+    for key in keys:
+        value = cache.get(key)
+        if result.count(value) == 0:
+            result.append(value)
+    return len(result)

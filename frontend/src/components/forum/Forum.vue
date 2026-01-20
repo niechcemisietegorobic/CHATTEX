@@ -5,14 +5,17 @@ import ForumPost from './ForumPost.vue';
 import { io } from 'socket.io-client';
 
 const props = defineProps(["username"]);
-const emit = defineEmits(["publicNotif", "privateNotif"]);
+const emit = defineEmits(["publicNotif", "privateNotif", "updateOnline"]);
 
 const posts: Ref<Array<any>> = ref([]);
 const typed_title = ref('');
 const typed_body = ref('');
 
 async function refreshPosts() {
-  const r = await fetch(`${API_URL}/api/forum/posts`);
+  const r = await fetch(`${API_URL}/api/forum/posts`, {
+    method: 'GET',
+    headers: tokenHeader()
+  });
   const list = await r.json();
 
   posts.value = list;
@@ -105,6 +108,10 @@ socket.on("forum_post_delete", (post) => {
 
 socket.on("forum_comment_delete", (comment) => {
   removeComment(comment.post_id, comment.id);
+});
+
+socket.on("stats", () => {
+    emit("updateOnline");
 });
 
 refreshPosts();
