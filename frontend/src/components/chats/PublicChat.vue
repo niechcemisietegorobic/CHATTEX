@@ -45,14 +45,18 @@ socket.on("forum_comment", () => {
   emit("forumNotif");
 });
 
-async function refreshPublic() {
-  const r = await fetch(`${API_URL}/api/public/messages`, {
+async function fetchPublic(scroll: boolean = true, skip: number = 0, limit: number = 30) {
+  const r = await fetch(`${API_URL}/api/public/messages?skip=${skip}&limit=${limit}`, {
+    method: 'GET',
     headers: tokenHeader(),
   });
   const list = await r.json();
 
-  messages.value = list;
-  scrollChatBox();
+  if (r.status !== 200) {
+      return;
+  }
+  messages.value = list.concat(messages.value);
+  if (scroll) scrollChatBox();
 }
 
 async function sendMessage() {
@@ -78,7 +82,7 @@ function scrollChatBox() {
   });
 }
 
-refreshPublic();
+fetchPublic();
 </script>
 
 <template>
@@ -87,6 +91,7 @@ refreshPublic();
     <div class="panel">
       <div class="panel-title">Publiczny czat</div>
       <div ref="chat_box" id="public-messages" class="box">
+        <button class="ghost more-button" @click="fetchPublic(false, messages.length)">Wczytaj poprzednie</button>
         <ChatMessage v-for="message in messages" :username="props.username" :isPrivate="false" :message @removeMessage="removeMessage" />
       </div>
       <form id="public-form" class="row">
@@ -101,5 +106,11 @@ refreshPublic();
 .panel-title {
   font-weight: 800;
   margin-bottom: 8px;
+}
+
+.more-button {
+  padding: 4px;
+  border-radius: 4px;
+  font-weight: 500;
 }
 </style>

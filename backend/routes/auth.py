@@ -44,6 +44,7 @@ def register():
     generate_user_account_invite(u.id)
     return jsonify({'message': 'Rejestracja udana'}), 201
 
+
 @auth_blueprint.route('/api/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login():

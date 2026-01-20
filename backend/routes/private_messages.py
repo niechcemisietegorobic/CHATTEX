@@ -14,7 +14,7 @@ def private_get():
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
 
-    with_user = (request.args.get('with') or '').strip()
+    with_user = (request.args.get('with', default="")).strip()
     if not with_user:
         return jsonify({'error': 'Podaj ?with=username'}), 400
 
@@ -95,7 +95,10 @@ def private_post():
 @private_messages_blueprint.route('/api/users', methods=['GET'])
 @limiter.limit("12 per minute")
 def list_users():
-    skip = request.args.get("skip", type=int) or 0
-    limit = max(request.args.get("limit", type=int) or 20, 50)
-    users = User.query.order_by(User.username.asc()).offset(skip).limit(limit).all()
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    skip = request.args.get("skip", default=0, type=int)
+    limit = min(request.args.get("limit", default=20, type=int), 50)
+    users = User.query.order_by(User.username.asc()).filter_by(id!=uid).offset(skip).limit(limit).all()
     return jsonify([u.username for u in users]), 200

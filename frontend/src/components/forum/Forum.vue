@@ -12,7 +12,10 @@ const typed_title = ref('');
 const typed_body = ref('');
 
 async function refreshPosts() {
-  const r = await fetch(`${API_URL}/api/forum/posts`);
+  const r = await fetch(`${API_URL}/api/forum/posts`, {
+    method: 'GET',
+    headers: tokenHeader()
+  });
   const list = await r.json();
 
   posts.value = list;
