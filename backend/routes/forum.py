@@ -5,6 +5,18 @@ from websock import send_to_all_except
 
 forum_blueprint = Blueprint("forum_blueprint", __name__)
 
+def wipe_post_reactios(post_id: int):
+    rows = PostReaction.query.filter_by(post_id=post_id).all()
+    for r in rows:
+        db.session.delete(r)
+    db.session.commit()
+
+def wipe_post_comments(post_id: int):
+    rows = ForumComment.query.filter_by(post_id=post_id).all()
+    for r in rows:
+        db.session.delete(r)
+    db.session.commit()
+
 def reaction_counts_for_post(post_id: int):
     rows = PostReaction.query.filter_by(post_id=post_id).all()
     counts = {}
@@ -12,8 +24,9 @@ def reaction_counts_for_post(post_id: int):
         counts[r.emoji] = counts.get(r.emoji, 0) + 1
     return counts
 
-def comments_for_post(post_id: int):
-    rows = ForumComment.query.filter_by(post_id=post_id).order_by(ForumComment.timestamp.desc()).limit(10).all()
+def comments_for_post(post_id: int, skip: int = 0, limit: int = 1):
+    rows = ForumComment.query.filter_by(post_id=post_id).order_by(
+        ForumComment.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for c in rows:
         author = User.query.get(c.author_id)
@@ -29,7 +42,11 @@ def comments_for_post(post_id: int):
 @forum_blueprint.route('/api/forum/posts', methods=['GET'])
 @limiter.limit("12 per minute")
 def forum_get_posts():
-    posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).limit(10).all()
+    skip = request.args.get("skip", type=int) or 0
+    limit = max(request.args.get("limit", type=int) or 3, 10)
+    cskip = request.args.get("skip", type=int) or 0
+    climit = max(request.args.get("limit", type=int) or 5, 20)
+    posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for p in posts:
         author = User.query.get(p.author_id)
@@ -40,7 +57,7 @@ def forum_get_posts():
             'body': p.body,
             'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
             'reactions': reaction_counts_for_post(p.id),
-            'comments': comments_for_post(p.id),
+            'comments': comments_for_post(p.id, cskip, climit),
         })
     return jsonify(out), 200
 
@@ -54,6 +71,8 @@ def forum_delete_post(pid: int):
     post = ForumPost.query.filter_by(id=pid).first()
     if (post.author_id != uid):
         return jsonify({'error': 'Brak uprawnień'}), 400
+    wipe_post_comments(pid)
+    wipe_post_reactios(pid)
     db.session.delete(post)
     db.session.commit()
     send_to_all_except(post.author_id, "forum_post_delete", {'id': pid})
@@ -91,6 +110,20 @@ def forum_add_post():
     }
     send_to_all_except(p.author_id, "forum_post", response)
     return jsonify(response), 201
+
+@forum_blueprint.route('/api/forum/comments/<int:cid>', methods=['DELETE'])
+@limiter.limit("3 per minute")
+def forum_delete_comment(cid: int):
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    comment = ForumComment.query.filter_by(id=cid).first()
+    if (comment.author_id != uid):
+        return jsonify({'error': 'Brak uprawnień'}), 400
+    db.session.delete(comment)
+    db.session.commit()
+    send_to_all_except(comment.author_id, "forum_comment_delete", {'id': cid, 'post_id': comment.post_id})
+    return jsonify({'id': cid, 'post_id': comment.post_id}), 200
 
 @forum_blueprint.route('/api/forum/comments', methods=['POST'])
 @limiter.limit("10 per minute")

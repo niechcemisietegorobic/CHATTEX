@@ -4,9 +4,10 @@ import { ref, type Ref, onUnmounted } from 'vue';
 import ForumPost from './ForumPost.vue';
 import { io } from 'socket.io-client';
 
+const props = defineProps(["username"]);
 const emit = defineEmits(["publicNotif", "privateNotif"]);
 
-const posts: Ref<any[], any[]> = ref([]);
+const posts: Ref<Array<any>> = ref([]);
 const typed_title = ref('');
 const typed_body = ref('');
 
@@ -39,10 +40,22 @@ function updateComment(post_id: number, comment: any) {
   }
 }
 
+function removeComment(post_id: number, comment_id: number) {
+  let i = posts.value.findIndex(post => post.id == post_id);
+  console.log(i);
+  if (i != -1) {
+    let j = (posts.value[i].comments as Array<any>).findIndex(c => c.id == comment_id);
+  console.log(j);
+    if (j != -1) {
+      posts.value[i].comments.pop(j);
+    }
+  }
+}
+
 function updateReactions(post_id: number, reactions: any) {
   let i = posts.value.findIndex(post => post.id == post_id);
   if (i != -1) {
-    posts.value[i].reactions = reactions;
+    posts.value[i]!.reactions = reactions;
   }
 }
 
@@ -74,13 +87,24 @@ socket.on("forum_reactions", (reactions_response) => {
   }
 });
 
+function removePost(id: number) {
+  posts.value = posts.value.filter(e => e.id != id);
+}
+
 socket.on("public_message", () => {
   emit("publicNotif");
 });
 
-
 socket.on("private_message", () => {
   emit("privateNotif");
+});
+
+socket.on("forum_post_delete", (post) => {
+  removePost(post.id);
+});
+
+socket.on("forum_comment_delete", (comment) => {
+  removeComment(comment.post_id, comment.id);
 });
 
 refreshPosts();
@@ -99,7 +123,8 @@ refreshPosts();
       </form>
 
       <div id="posts" class="posts">
-        <ForumPost v-for="post in posts" :post @updateComment="updateComment" @updateReactions="updateReactions" />
+        <ForumPost v-for="post in posts" :post :username="props.username" @updateComment="updateComment"
+          @updateReactions="updateReactions" @removePost="removePost" @removeComment="removeComment" />
       </div>
     </div>
   </section>

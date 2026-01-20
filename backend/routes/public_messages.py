@@ -8,11 +8,13 @@ public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 @public_messages_blueprint.route('/api/public/messages', methods=['GET'])
 @limiter.limit("24 per minute")
 def public_get():
+    skip = request.args.get("skip", type=int) or 0
+    limit = max(request.args.get("limit", type=int) or 30, 100)
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     # Pobiera wiadomości z publicznego czatu
-    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.desc()).limit(100).all()
+    msgs = PublicMessage.query.order_by(PublicMessage.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for m in msgs:
         u = User.query.get(m.user_id)

@@ -6,9 +6,8 @@ import AppFooter from './components/AppFooter.vue';
 import { IS_DEV } from './constants';
 
 if (IS_DEV) {
-  // rzułte tło dla wersji dev żeby się nie pomylić
   document.body.style.backgroundBlendMode = "multiply";
-  document.body.style.backgroundColor = "goldenrod";
+  document.body.style.backgroundColor = "#FAA99B";
 }
 </script>
 
