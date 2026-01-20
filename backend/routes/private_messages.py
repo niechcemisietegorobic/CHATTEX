@@ -8,8 +8,8 @@ private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
 @limiter.limit("24 per minute")
 def private_get():
-    skip = request.args.get("skip", type=int) or 0
-    limit = max(request.args.get("limit", type=int) or 30, 100)
+    skip = request.args.get("skip", default=0, type=int)
+    limit = min(request.args.get("limit", default=30, type=int), 100)
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
