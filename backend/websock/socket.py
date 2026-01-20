@@ -1,7 +1,8 @@
 from flask_socketio import SocketIO
 from flask import request
-from helpers import socket_auth_user_id
+from helpers import socket_auth_user_id, session_duration
 from .cache import cache, get_all_key_values
+from glide_sync import ExpirySet, ExpiryType
 import os
 
 socket = SocketIO(cors_allowed_origins=[os.environ.get("FRONTEND_URL")])
@@ -19,7 +20,7 @@ def handle_connect(data):
     if (data is not None and data["token"] is not None):
         user_id = socket_auth_user_id(data["token"])
         if (user_id is not None):
-            cache.set(request.sid, str(user_id))
+            cache.set(request.sid, str(user_id), expiry=ExpirySet(ExpiryType.SEC, session_duration()))
 
 @socket.on("disconnect")
 def handle_disconnect():

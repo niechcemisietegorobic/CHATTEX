@@ -3,7 +3,7 @@ from flask import request, jsonify, Blueprint, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
-from helpers import get_root_invite, random_invite_code, limiter
+from helpers import get_root_invite, random_invite_code, limiter, session_duration
 
 ROOT_INVITE = get_root_invite()
 
@@ -61,7 +61,7 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({'error': 'Nieprawidłowa nazwa użytkownika lub hasło'}), 401
 
-    token_payload = {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8)}
+    token_payload = {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=session_duration())}
     token = jwt.encode(token_payload, current_app.config["SECRET_KEY"], algorithm='HS256')
     if isinstance(token, bytes):
         token = token.decode('utf-8')

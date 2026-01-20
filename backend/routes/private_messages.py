@@ -100,5 +100,5 @@ def list_users():
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     skip = request.args.get("skip", default=0, type=int)
     limit = min(request.args.get("limit", default=20, type=int), 50)
-    users = User.query.order_by(User.username.asc()).filter_by(id!=uid).offset(skip).limit(limit).all()
+    users = User.query.order_by(User.username.asc()).filter(id != uid).offset(skip).limit(limit).all()
     return jsonify([u.username for u in users]), 200
