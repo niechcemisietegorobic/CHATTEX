@@ -12,7 +12,7 @@ def fetch_health():
 
 
 @health_blueprint.route("/api/stats", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("24 per minute")
 def fetch_stats():
     online = get_online_number()
     registered = User.query.count()

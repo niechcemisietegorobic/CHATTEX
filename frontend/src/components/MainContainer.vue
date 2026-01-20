@@ -26,6 +26,7 @@ function updateIsLogged(val: boolean) {
     } else {
         fetchBackground();
     }
+    updateOnline();
 }
 
 async function fetchDefaultBackground() {
