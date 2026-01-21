@@ -10,6 +10,7 @@ const emit = defineEmits(["publicNotif", "privateNotif", "updateOnline"]);
 const posts: Ref<Array<any>> = ref([]);
 const typed_title = ref('');
 const typed_body = ref('');
+const selected_post = ref(0);
 
 async function refreshPosts() {
   const r = await fetch(`${API_URL}/api/forum/posts`, {
@@ -48,7 +49,7 @@ function removeComment(post_id: number, comment_id: number) {
   console.log(i);
   if (i != -1) {
     let j = (posts.value[i].comments as Array<any>).findIndex(c => c.id == comment_id);
-  console.log(j);
+    console.log(j);
     if (j != -1) {
       posts.value[i].comments.pop(j);
     }
@@ -111,7 +112,7 @@ socket.on("forum_comment_delete", (comment) => {
 });
 
 socket.on("stats", () => {
-    emit("updateOnline");
+  emit("updateOnline");
 });
 
 refreshPosts();
@@ -129,8 +130,15 @@ refreshPosts();
         <button type="submit" @click.prevent="addPost">Dodaj post</button>
       </form>
 
+      <div class="row">
+        <button>Wróć</button>
+        <button>Poprzednie</button>
+        <button>Następne</button>
+      </div>
+
       <div id="posts" class="posts">
-        <ForumPost v-for="post in posts" :post :username="props.username" @updateComment="updateComment"
+        <div></div>
+        <ForumPost v-for="post in posts" :summary="true" :post :username="props.username" @updateComment="updateComment"
           @updateReactions="updateReactions" @removePost="removePost" @removeComment="removeComment" />
       </div>
     </div>
