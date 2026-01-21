@@ -180,6 +180,14 @@ fetchUsers();
     height: max(260px, 40vh);
 }
 
+.users-list > button {
+    margin-top: 3px;
+}
+
+.users-list::-webkit-scrollbar {
+  display: none;
+}
+
 .expand {
     width: 100%;
 }

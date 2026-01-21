@@ -6,7 +6,7 @@ from websock import send_to_all_except
 public_messages_blueprint = Blueprint("public_messages_blueprint", __name__)
 
 @public_messages_blueprint.route('/api/public/messages', methods=['GET'])
-@limiter.limit("24 per minute")
+@limiter.limit("48 per minute")
 def public_get():
     skip = request.args.get("skip", default=0, type=int)
     limit = min(request.args.get("limit", default=30, type=int), 100)
@@ -29,7 +29,7 @@ def public_get():
 
 
 @public_messages_blueprint.route('/api/public/messages/<int:mid>', methods=['DELETE'])
-@limiter.limit("6 per minute")
+@limiter.limit("12 per minute")
 def public_delete(mid: int):
     uid = auth_user_id()
     if not uid:

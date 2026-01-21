@@ -6,7 +6,7 @@ from websock import send_only_to
 private_messages_blueprint = Blueprint("private_messages_blueprint", __name__)
 
 @private_messages_blueprint.route('/api/private/messages', methods=['GET'])
-@limiter.limit("24 per minute")
+@limiter.limit("48 per minute")
 def private_get():
     skip = request.args.get("skip", default=0, type=int)
     limit = min(request.args.get("limit", default=30, type=int), 100)
@@ -44,7 +44,7 @@ def private_get():
 
 
 @private_messages_blueprint.route('/api/private/messages/<int:mid>', methods=['DELETE'])
-@limiter.limit("6 per minute")
+@limiter.limit("12 per minute")
 def private_delete(mid: int):
     uid = auth_user_id()
     if not uid:
@@ -93,7 +93,7 @@ def private_post():
 
 
 @private_messages_blueprint.route('/api/users', methods=['GET'])
-@limiter.limit("12 per minute")
+@limiter.limit("24 per minute")
 def list_users():
     uid = auth_user_id()
     if not uid:
