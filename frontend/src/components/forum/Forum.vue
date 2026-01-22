@@ -202,7 +202,7 @@ refreshPosts();
 
         <ForumPost v-if="is_browsing" @click="selectPost(post.id)" v-for="post in posts" :summary="true" :post
           :username="props.username" @updateComment="updateComment" @updateReactions="updateReactions"
-          @removePost="removePost" @removeComment="removeComment" />
+          @removePost="removePost" @removeComment="removeComment" class="clickable" />
         <div v-if="is_browsing && posts.length == 0">Brak postów na stronie {{ 1 + Math.floor(skip_count /
           POSTS_PER_PAGE) }}</div>
       </div>
@@ -225,5 +225,9 @@ refreshPosts();
 .navigation-buttons {
   margin-left: auto;
   margin-right: auto;
+}
+
+.clickable {
+  cursor: pointer;
 }
 </style>

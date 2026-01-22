@@ -52,7 +52,6 @@ function removeComment(post_id: number, comment_id: number) {
             {{ props.post.title }}
             <button v-if="!props.summary" class="removal-button" v-show="hovered && props.username == props.post.author"
                 @click="removePost">Usuń</button>
-            <button v-if="props.summary" class="removal-button" v-show="hovered">Wyświetl</button>
         </div>
         <div class="post-meta">
             {{ props.post.timestamp + " • " + props.post.author }}
