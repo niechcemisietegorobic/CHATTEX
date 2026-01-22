@@ -4,7 +4,7 @@ import ForumComment from './ForumComment.vue';
 import { ref } from 'vue';
 import { API_URL, tokenHeader } from '@/constants';
 
-const props = defineProps(["post", "username"]);
+const props = defineProps(["post", "username", "summary"]);
 const emit = defineEmits(["updateComment", "updateReactions", "removePost", "removeComment"]);
 const typed_comment = ref('');
 const hovered = ref(false);
@@ -50,27 +50,28 @@ function removeComment(post_id: number, comment_id: number) {
     <div class="post" @mouseenter="hovered = true" @mouseleave="hovered = false">
         <div class="post-title">
             {{ props.post.title }}
-            <button class="removal-button" v-show="hovered && props.username == props.post.author"
+            <button v-if="!props.summary" class="removal-button" v-show="hovered && props.username == props.post.author"
                 @click="removePost">Usuń</button>
         </div>
         <div class="post-meta">
             {{ props.post.timestamp + " • " + props.post.author }}
         </div>
-        <div class="post-body">
+        <div class="post-body" v-if="!props.summary">
             {{ props.post.body }}
         </div>
-        <div class="react-row">
+        <div class="react-row" v-if="!props.summary">
             <ForumReaction v-for="reaction in REACTIONS" :icon="reaction" :post_id="props.post.id"
                 :count="(props.post.reactions && props.post.reactions[reaction]) ? props.post.reactions[reaction] : 0"
                 @updateReactions="updateReactions" />
         </div>
-        <div class="comm-title">
+        <div class="comm-title" v-if="!props.summary">
             Komentarze:
         </div>
-        <div class="comments">
-            <ForumComment v-for="comment in props.post.comments" :comment :username="props.username" @removeComment="removeComment" />
+        <div class="comments" v-if="!props.summary">
+            <ForumComment v-for="comment in props.post.comments" :comment :username="props.username"
+                @removeComment="removeComment" />
         </div>
-        <form class="row">
+        <form class="row" v-if="!props.summary">
             <input v-model="typed_comment" type="text" class="comment-input" placeholder="Dodaj komentarz..."
                 required />
             <button type="submit" @click.prevent="addComment">Dodaj</button>

@@ -27,7 +27,7 @@ def register():
         return jsonify({'error': 'Brak danych rejestracyjnych'}), 400
     elif len(username) < 3 or len(password) < 8:
         return jsonify({'error': 'Nazwa użytkownika lub hasło są zbyt krótkie'}), 400
-    elif len(username) > 80 or len(password) > 80:
+    elif len(username) > 16 or len(password) > 80:
         return jsonify({'error': 'Nazwa użytkownika lub hasło są zbyt długie'}), 400
     elif User.query.filter_by(username=username).first():
         return jsonify({'error': 'Użytkownik już istnieje'}), 400

@@ -39,16 +39,15 @@ def comments_for_post(post_id: int, skip: int = 0, limit: int = 1):
     out.reverse()
     return out
 
+
 @forum_blueprint.route('/api/forum/posts', methods=['GET'])
-@limiter.limit("12 per minute")
+@limiter.limit("48 per minute")
 def forum_get_posts():
     uid = auth_user_id()
     if not uid:
         return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
     skip = request.args.get("skip", default=0, type=int)
-    limit = min(request.args.get("limit", default=3, type=int), 10)
-    cskip = request.args.get("skip", default=0, type=int)
-    climit = min(request.args.get("limit", default=5, type=int), 20)
+    limit = min(request.args.get("limit", default=10, type=int), 10)
     posts = ForumPost.query.order_by(ForumPost.timestamp.desc()).offset(skip).limit(limit).all()
     out = []
     for p in posts:
@@ -57,16 +56,33 @@ def forum_get_posts():
             'id': p.id,
             'author': author.username if author else 'Nieznany',
             'title': p.title,
-            'body': p.body,
-            'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-            'reactions': reaction_counts_for_post(p.id),
-            'comments': comments_for_post(p.id, cskip, climit),
+            'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
     return jsonify(out), 200
 
 
+@forum_blueprint.route('/api/forum/posts/<int:pid>', methods=['GET'])
+@limiter.limit("24 per minute")
+def forum_get_post(pid: int):
+    uid = auth_user_id()
+    if not uid:
+        return jsonify({'error': 'Brak/nieprawidłowy token'}), 401
+    p = ForumPost.query.filter_by(id=pid).first()
+    author = User.query.get(p.author_id)
+    out = {
+            'id': p.id,
+            'author': author.username if author else 'Nieznany',
+            'title': p.title,
+            'body': p.body,
+            'timestamp': p.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            'reactions': reaction_counts_for_post(p.id),
+            'comments': comments_for_post(p.id, 0, 10),
+        }
+    return jsonify(out), 200
+
+
 @forum_blueprint.route('/api/forum/posts/<int:pid>', methods=['DELETE'])
-@limiter.limit("3 per minute")
+@limiter.limit("12 per minute")
 def forum_delete_post(pid: int):
     uid = auth_user_id()
     if not uid:
@@ -83,7 +99,7 @@ def forum_delete_post(pid: int):
 
 
 @forum_blueprint.route('/api/forum/posts', methods=['POST'])
-@limiter.limit("2 per minute")
+@limiter.limit("6 per minute")
 def forum_add_post():
     #dodawanie wlasnego posta
     uid = auth_user_id()
@@ -115,7 +131,7 @@ def forum_add_post():
     return jsonify(response), 201
 
 @forum_blueprint.route('/api/forum/comments/<int:cid>', methods=['DELETE'])
-@limiter.limit("3 per minute")
+@limiter.limit("12 per minute")
 def forum_delete_comment(cid: int):
     uid = auth_user_id()
     if not uid:
