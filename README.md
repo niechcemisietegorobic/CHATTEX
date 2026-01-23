@@ -4,17 +4,17 @@
 ![Frontend Prod Build](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZ1lCdzVqV3JJT1FhWld6K0I4QzYwdG84bUcxQ01GbVpFRjc4QTNzSmJrbUJoOHZ1Z0szV1pXVHZ6dVZCSVB5Zlk5aHY0R1lad09TbWFha0FUVGYxblpnPSIsIml2UGFyYW1ldGVyU3BlYyI6InhvUk1VOWFMZUpBaFZEMkQiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 CHATTEX to webowa aplikacja **czat + forum**, stworzona jako projekt zespołowy
-z zakresu **chmur obliczeniowych / aplikacji webowych**.
+z przedmiotu **Bezpieczeństwo serwerów i aplikacji Web** na kierunku Cyberbezpieczeństwo.
 
 Aplikacja umożliwia:
-- zapraszanie nowych użytkowników
-- używanie publicznego czatu wszystkich użytkowników
+- personalizacje wyglądu
+- korzystanie z publicznego czatu
 - pisanie prywatnych wiadomości (DM)
 - publikowanie i komentowanie postów na forum
 
 ---
 
-## 🏗 Architektura aplikacji
+## Architektura aplikacji
 
 Aplikacja składa się z dwóch głównych komponentów:
 
@@ -55,6 +55,12 @@ W celu poprawnego funkcjonowania aplikacji konieczne jest skonfigurowanie sekret
 | Zmienna  | MEDIA_URL  | adres url z którego udostępniane są media  |
 | Zmienna  | REGION  | region w którym uruchomiona jest infrastruktura  |
 
+### frontend
+
+| Typ  | Nazwa | Opis | 
+| ------------- | ------------- | ------------- | 
+| Parametr  | /CHATTEX_\<branch\>/API_URL  | adres url api https |
+| Parametr  | /CHATTEX_\<branch\>/WEBSOCKET_API_URL  | adres url api wss  |
 
 ---
 

@@ -111,7 +111,6 @@ fetchUsers();
 </script>
 
 <template>
-    <!-- PRYWATNE -->
     <section class="tabpane" id="tab-private">
         <div class="panel">
             <div class="panel-title">Prywatne wiadomości</div>
