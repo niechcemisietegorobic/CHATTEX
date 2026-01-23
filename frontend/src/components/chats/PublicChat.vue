@@ -90,7 +90,6 @@ fetchPublic();
 </script>
 
 <template>
-  <!-- PUBLICZNE -->
   <section class="tabpane" id="tab-public">
     <div class="panel">
       <div class="panel-title">Publiczny czat</div>

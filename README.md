@@ -4,35 +4,28 @@
 ![Frontend Prod Build](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZ1lCdzVqV3JJT1FhWld6K0I4QzYwdG84bUcxQ01GbVpFRjc4QTNzSmJrbUJoOHZ1Z0szV1pXVHZ6dVZCSVB5Zlk5aHY0R1lad09TbWFha0FUVGYxblpnPSIsIml2UGFyYW1ldGVyU3BlYyI6InhvUk1VOWFMZUpBaFZEMkQiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 CHATTEX to webowa aplikacja **czat + forum**, stworzona jako projekt zespołowy
-z zakresu **chmur obliczeniowych / aplikacji webowych**.
+z przedmiotu **Bezpieczeństwo serwerów i aplikacji Web** na kierunku **Cyberbezpieczeństwo**.
 
 Aplikacja umożliwia:
-- zapraszanie nowych użytkowników
-- używanie publicznego czatu wszystkich użytkowników
+- personalizacje wyglądu
+- korzystanie z publicznego czatu
 - pisanie prywatnych wiadomości (DM)
 - publikowanie i komentowanie postów na forum
 
 ---
 
-## 🏗 Architektura aplikacji
+## Architektura aplikacji
 
 Aplikacja składa się z dwóch głównych komponentów:
 
-### Backend
-- Python + Flask, REST API, JWT (autoryzacja)
-
-Katalog:
-```
-backend/
-```
-
-### Frontend
-- Vue js, REST API
-
-Katalog:
-```
-frontend/
-```
+- backend
+  - katalog: backend/
+  - budowany z: Dockerfile
+  - Python + Flask, REST API, JWT (autoryzacja), Valkey GLIDE
+- frontend
+  - katalog: frontend/
+  - budowany z: buildspec.\<wersja\>.yml
+  - Typescript + Vue.js, REST API, Websockets
 
 ---
 
@@ -44,8 +37,8 @@ W celu poprawnego funkcjonowania aplikacji konieczne jest skonfigurowanie sekret
 
 | Typ  | Nazwa | Opis | 
 | ------------- | ------------- | ------------- | 
-| Sekret | \<branch\>/chattex/django_secret_key  | sekret używany przez django  |
-| Sekret  | \<branch\>/chattex/root_invite  | pierwsze zaproszenie służące do rejestracji na platformie  |
+| Sekret | \<wersja\>/chattex/django_secret_key  | sekret używany przez django  |
+| Sekret  | \<wersja\>/chattex/root_invite  | pierwsze zaproszenie służące do rejestracji na platformie  |
 | Zmienna  | IS_DEV  | czy kontener działa w wersji dev  |
 | Zmienna  | RDS_URL  | adres bazy PostgreSQL  |
 | Zmienna  | CACHE_URL  | adres ElastiCache  |
@@ -55,10 +48,16 @@ W celu poprawnego funkcjonowania aplikacji konieczne jest skonfigurowanie sekret
 | Zmienna  | MEDIA_URL  | adres url z którego udostępniane są media  |
 | Zmienna  | REGION  | region w którym uruchomiona jest infrastruktura  |
 
+### frontend (kompilacja)
+
+| Typ  | Nazwa | Opis | 
+| ------------- | ------------- | ------------- | 
+| Parametr  | /CHATTEX_\<WERSJA\>/API_URL  | adres url api https |
+| Parametr  | /CHATTEX_\<WERSJA\>/WEBSOCKET_API_URL  | adres url api wss  |
 
 ---
 
-## ☁️ Architektura chmurowa (AWS)
+## Architektura chmurowa (AWS)
 
 ### Schemat infrastruktury
 
@@ -68,5 +67,4 @@ W celu poprawnego funkcjonowania aplikacji konieczne jest skonfigurowanie sekret
 
 ![CI/CD pipeline graph](.github/ci_cd.png "CI/CD pipeline graph")
 
----
 

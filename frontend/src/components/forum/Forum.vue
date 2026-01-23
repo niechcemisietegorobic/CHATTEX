@@ -4,7 +4,7 @@ import { ref, type Ref, onUnmounted } from 'vue';
 import ForumPost from './ForumPost.vue';
 import { io } from 'socket.io-client';
 
-const POSTS_PER_PAGE = 20;
+const POSTS_PER_PAGE = 5;
 
 const props = defineProps(["username"]);
 const emit = defineEmits(["publicNotif", "privateNotif", "updateOnline"]);
@@ -53,30 +53,18 @@ async function addPost() {
   const data = await r.json();
   if (r.status !== 201) alert(data.error || 'Błąd dodania posta');
   else {
-    // posts.value.unshift(data);
     is_writing.value = false;
     await refreshPosts();
   }
 }
 
 function updateComment(post_id: number, comment: any) {
-  // let i = posts.value.findIndex(post => post.id == post_id);
-  // if (i != -1) {
-  //   posts.value[i].comments.push(comment);
-  // }
   if (selected_post.value.id == post_id) {
     selected_post.value.comments.push(comment);
   }
 }
 
 function removeComment(post_id: number, comment_id: number) {
-  // let i = posts.value.findIndex(post => post.id == post_id);
-  // if (i != -1) {
-  //   let j = (posts.value[i].comments as Array<any>).findIndex(c => c.id == comment_id);
-  //   if (j != -1) {
-  //     posts.value[i].comments.pop(j);
-  //   }
-  // }
   if (selected_post.value.id == post_id) {
     let j = (selected_post.value.comments as Array<any>).findIndex(c => c.id == comment_id);
     if (j != -1) {
@@ -86,10 +74,6 @@ function removeComment(post_id: number, comment_id: number) {
 }
 
 function updateReactions(post_id: number, reactions: any) {
-  // let i = posts.value.findIndex(post => post.id == post_id);
-  // if (i != -1) {
-  //   posts.value[i]!.reactions = reactions;
-  // }
   if (selected_post.value.id == post_id) {
     selected_post.value.reactions = reactions;
   }
@@ -106,25 +90,16 @@ onUnmounted(() => {
 });
 
 socket.on("forum_post", (post) => {
-  // posts.value.unshift(post);
   refreshPosts();
 });
 
 socket.on("forum_comment", (comment_response) => {
-  // let i = posts.value.findIndex(post => post.id == comment_response.post_id);
-  // if (i != -1) {
-  //   posts.value[i].comments.push(comment_response.comment);
-  // }
   if (selected_post.value.id == comment_response.post_id) {
     selected_post.value.comments.push(comment_response.comment);
   }
 });
 
 socket.on("forum_reactions", (reactions_response) => {
-  // let i = posts.value.findIndex(post => post.id == reactions_response.post_id);
-  // if (i != -1) {
-  //   posts.value[i].reactions = (reactions_response.reactions);
-  // }
   if (selected_post.value.id == reactions_response.post_id) {
     selected_post.value.reactions = (reactions_response.reactions);
   }
@@ -173,7 +148,6 @@ refreshPosts();
 </script>
 
 <template>
-  <!-- FORUM i wszystko wokol -->
   <section class="tabpane" id="tab-forum">
     <div class="panel">
       <div class="panel-title">Forum - posty</div>
